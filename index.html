@@ -1943,34 +1943,67 @@ function App() {
   const [toast, setToast] = useState(null);
 
   // ── Auth ──────────────────────────────────────────────────────────────────
-  async function handleAuth() {
-    if (!uInput.trim() || !pInput.trim()) { setAuthErr('Please fill in all fields.'); return; }
-    if (authMode === 'register' && !nameInput.trim()) { setAuthErr('Please enter your name.'); return; }
-    setAuthLoading(true); setAuthErr('');
-    await new Promise(r => setTimeout(r, 300));
+  // Consistent hash: same function used for both register and login
+  function makeHash(pw) {
+    try { return btoa(encodeURIComponent(pw)); } catch(e) { return btoa(pw); }
+  }
 
-    const key = 'qisas_auth_' + uInput.trim().toLowerCase();
+  async function handleAuth() {
+    const user = uInput.trim().toLowerCase();
+    const pass = pInput.trim();
+    const name = nameInput.trim();
+
+    if (!user || !pass) { setAuthErr('Please fill in all fields.'); return; }
+    if (authMode === 'register' && !name) { setAuthErr('Please enter your name.'); return; }
+
+    setAuthLoading(true); setAuthErr('');
+    await new Promise(r => setTimeout(r, 250));
+
+    const storageKey = 'qisas_auth_' + user;
+
     if (authMode === 'register') {
-      if (localStorage.getItem(key)) { setAuthErr('Username already exists.'); setAuthLoading(false); return; }
-      const hash = btoa(unescape(encodeURIComponent(pInput)));
-      localStorage.setItem(key, JSON.stringify({ hash, name: nameInput.trim(), type: userType }));
-      const p = { name: nameInput.trim(), booksRead:[], badges:[], streak:0, chaptersCompleted:{}, booksCompleted:[], quizzesCompleted:0, perfectQuizzes:0 };
-      saveProfile(uInput.trim().toLowerCase(), p);
+      if (localStorage.getItem(storageKey)) {
+        setAuthErr('Username already taken. Please sign in instead.');
+        setAuthLoading(false); return;
+      }
+      // Save auth record with consistent hash
+      localStorage.setItem(storageKey, JSON.stringify({ hash: makeHash(pass), name, type: userType }));
+
+      // Save blank profile
+      const p = { name, booksRead:[], badges:[], streak:0, chaptersCompleted:{}, booksCompleted:[], quizzesCompleted:0, perfectQuizzes:0 };
+      saveProfile(user, p);
+      localStorage.setItem('qisas_user', user);
       setProfile(p);
-      setUsername(uInput.trim().toLowerCase());
+      setUsername(user);
       setIsParent(userType === 'parent');
-      localStorage.setItem('qisas_user', uInput.trim().toLowerCase());
+
     } else {
-      const stored = localStorage.getItem(key);
-      if (!stored) { setAuthErr('Username not found.'); setAuthLoading(false); return; }
-      const { hash, type } = JSON.parse(stored);
-      if (hash !== btoa(unescape(encodeURIComponent(pInput)))) { setAuthErr('Incorrect password.'); setAuthLoading(false); return; }
-      const p = getProfile(uInput.trim().toLowerCase());
+      // Login — look up stored record
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) {
+        setAuthErr('No account found for "' + user + '". Please register first.');
+        setAuthLoading(false); return;
+      }
+      let record;
+      try { record = JSON.parse(raw); } catch(e) {
+        setAuthErr('Account data error. Please register again.');
+        setAuthLoading(false); return;
+      }
+      // Accept both hash formats for backwards compatibility
+      const ok = record.hash === makeHash(pass)
+               || record.hash === btoa(pass)
+               || record.hash === btoa(unescape(encodeURIComponent(pass)));
+      if (!ok) {
+        setAuthErr('Incorrect password. Please try again.');
+        setAuthLoading(false); return;
+      }
+      const p = getProfile(user);
+      localStorage.setItem('qisas_user', user);
       setProfile(p);
-      setUsername(uInput.trim().toLowerCase());
-      setIsParent(type === 'parent');
-      localStorage.setItem('qisas_user', uInput.trim().toLowerCase());
+      setUsername(user);
+      setIsParent(record.type === 'parent');
     }
+
     setAuthLoading(false);
   }
 
@@ -2023,16 +2056,50 @@ function App() {
 
   // ── Auth screen ────────────────────────────────────────────────────────────
   if (!username) {
+    // Detect saved accounts so we can show them
+    const savedAccounts = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('qisas_auth_')) {
+        try {
+          const rec = JSON.parse(localStorage.getItem(k));
+          savedAccounts.push({ user: k.replace('qisas_auth_', ''), name: rec.name, type: rec.type });
+        } catch {}
+      }
+    }
+    // Auto-detect: if user typed a known username, switch to login
+    const typedKnown = uInput.trim() && localStorage.getItem('qisas_auth_' + uInput.trim().toLowerCase());
+
     return (
       <div className="auth-wrap">
         <div className="auth-card" style={{animation:'fadeIn 0.5s ease'}}>
           <span className="auth-crescent">☪️</span>
           <div className="auth-title" style={{fontFamily:'var(--font-title)'}}>Qisas-ul-Saliheen</div>
           <div className="auth-arabic">قصص الصالحين</div>
+
+          {/* Quick-pick saved accounts */}
+          {savedAccounts.length > 0 && authMode === 'login' && (
+            <div style={{marginBottom:16}}>
+              <div style={{fontFamily:'var(--font-ui)',fontSize:10,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}>
+                Saved Accounts
+              </div>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                {savedAccounts.map(acc => (
+                  <button key={acc.user}
+                    style={{padding:'7px 14px',borderRadius:10,border:'2px solid var(--border)',background:uInput===acc.user?'var(--parchment2)':'var(--white)',fontFamily:'var(--font-ui)',fontSize:12,fontWeight:800,cursor:'pointer',color:'var(--ink)',transition:'all 0.2s',display:'flex',alignItems:'center',gap:6}}
+                    onClick={()=>setUInput(acc.user)}>
+                    {acc.type==='parent'?'👨':'👦'} {acc.name || acc.user}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="auth-tabs">
             <button className={`auth-tab${authMode==='login'?' active':''}`} onClick={()=>{setAuthMode('login');setAuthErr('')}}>Sign In</button>
             <button className={`auth-tab${authMode==='register'?' active':''}`} onClick={()=>{setAuthMode('register');setAuthErr('')}}>Register</button>
           </div>
+
           {authMode==='register' && (
             <div className="auth-type-row">
               <button className={`auth-type-btn${userType==='child'?' active':''}`} onClick={()=>setUserType('child')}>
@@ -2043,7 +2110,21 @@ function App() {
               </button>
             </div>
           )}
+
           {authErr && <div className="auth-err">{authErr}</div>}
+
+          {/* Smart hint: typed username exists, suggest signing in */}
+          {!authErr && typedKnown && authMode==='register' && (
+            <div style={{background:'#fef9e7',border:'1px solid var(--gold)',borderRadius:8,padding:'8px 12px',marginBottom:10,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)'}}>
+              ✅ That username exists — <span style={{color:'var(--teal)',cursor:'pointer',textDecoration:'underline'}} onClick={()=>setAuthMode('login')}>Sign in instead?</span>
+            </div>
+          )}
+          {!authErr && uInput.trim() && !typedKnown && authMode==='login' && (
+            <div style={{background:'#fef9e7',border:'1px solid var(--gold)',borderRadius:8,padding:'8px 12px',marginBottom:10,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)'}}>
+              ℹ️ No account for "{uInput.trim()}" yet — <span style={{color:'var(--teal)',cursor:'pointer',textDecoration:'underline'}} onClick={()=>setAuthMode('register')}>Register instead?</span>
+            </div>
+          )}
+
           {authMode==='register' && (
             <div className="auth-field">
               <label className="auth-label">Your Name</label>
@@ -2052,16 +2133,25 @@ function App() {
           )}
           <div className="auth-field">
             <label className="auth-label">Username</label>
-            <input className="auth-inp" placeholder="e.g. ibraheem" value={uInput} onChange={e=>setUInput(e.target.value)}/>
+            <input className="auth-inp" placeholder="e.g. ibraheem" value={uInput}
+              onChange={e=>{setUInput(e.target.value);setAuthErr('');}}
+              autoComplete="username"/>
           </div>
           <div className="auth-field">
             <label className="auth-label">Password</label>
-            <input className="auth-inp" type="password" placeholder="••••••••" value={pInput} onChange={e=>setPInput(e.target.value)}
-              onKeyDown={e=>e.key==='Enter'&&handleAuth()}/>
+            <input className="auth-inp" type="password" placeholder="••••••••" value={pInput}
+              onChange={e=>setPInput(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&handleAuth()}
+              autoComplete={authMode==='login'?'current-password':'new-password'}/>
           </div>
           <button className="auth-btn" onClick={handleAuth} disabled={authLoading}>
-            {authLoading ? 'One moment...' : authMode==='login' ? '📖 Enter the Library' : '🌟 Begin My Journey'}
+            {authLoading ? 'One moment...' : authMode==='login' ? '📖 Enter the Library' : '🌟 Create My Account'}
           </button>
+          {authMode==='register' && (
+            <div style={{marginTop:12,fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',textAlign:'center',fontWeight:600}}>
+              Your account is saved in this browser. Next time, just sign in.
+            </div>
+          )}
         </div>
       </div>
     );
