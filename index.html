@@ -595,8 +595,8 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ─── Supabase ────────────────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://ifayrtuouxlfnvtyhnjz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmYXlydHVvdXhsZm52dHlobmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0NDA0NTYsImV4cCI6MjAyMzAxNjQ1Nn0.PLACEHOLDER';
+const SUPABASE_URL = 'https://cyqflkfdoduxgnynqgct.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5cWZsa2Zkb2R1eGdueW5xZ2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2Mzc5MTksImV4cCI6MjA5MDIxMzkxOX0.TLViuL8uODpWz7fp10PB2YuDaDzgHStHvIMqdXM72bU';
 const sb = { url: SUPABASE_URL, key: SUPABASE_KEY };
 async function sbFetch(path, opts={}) {
   const r = await fetch(sb.url + path, {
