@@ -50,28 +50,45 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 /* ===== HEADER ===== */
 .header{
   background:linear-gradient(135deg,#1a2a1a 0%,#2c1810 40%,#1a2a40 100%);
-  padding:0 28px;height:68px;
-  display:flex;align-items:center;gap:16px;
+  padding:0 20px;
+  min-height:64px;height:auto;
+  display:flex;align-items:center;gap:10px;
   box-shadow:0 4px 24px rgba(0,0,0,0.4);
-  flex-shrink:0;position:relative;overflow:hidden;
+  flex-shrink:0;position:relative;
+  z-index:100;
 }
 .header::before{
-  content:'';position:absolute;inset:0;
+  content:'';position:absolute;inset:0;pointer-events:none;
   background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9942a' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
-.header-logo{font-family:var(--font-title);font-size:22px;color:var(--gold2);font-weight:700;letter-spacing:1px;position:relative}
-.header-logo span{display:block;font-size:10px;color:rgba(232,184,75,0.7);font-family:var(--font-ui);font-weight:600;letter-spacing:3px;text-transform:uppercase;margin-top:1px}
-.header-crescent{font-size:28px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(201,148,42,0.5))}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.header-btn{padding:7px 16px;border-radius:20px;border:1.5px solid rgba(201,148,42,0.4);background:transparent;color:rgba(232,184,75,0.8);font-family:var(--font-ui);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px}
+.header-logo{font-family:var(--font-title);font-size:19px;color:var(--gold2);font-weight:700;letter-spacing:1px;position:relative;white-space:nowrap;}
+.header-logo span{display:block;font-size:9px;color:rgba(232,184,75,0.7);font-family:var(--font-ui);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.header-crescent{font-size:26px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(201,148,42,0.5));flex-shrink:0;}
+.header-right{
+  margin-left:auto;display:flex;align-items:center;gap:7px;
+  flex-wrap:nowrap;padding:12px 0;flex-shrink:0;
+}
+.header-btn{
+  padding:6px 12px;border-radius:18px;
+  border:1.5px solid rgba(201,148,42,0.4);
+  background:transparent;color:rgba(232,184,75,0.85);
+  font-family:var(--font-ui);font-size:11px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.2px;
+  white-space:nowrap;flex-shrink:0;line-height:1.4;
+}
 .header-btn:hover,.header-btn.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
-.user-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(201,148,42,0.15);border:1px solid rgba(201,148,42,0.3)}
-.user-badge-name{font-family:var(--font-ui);font-size:12px;font-weight:800;color:var(--gold2)}
-.user-badge-icon{font-size:18px}
+.user-badge{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:18px;
+  background:rgba(201,148,42,0.15);border:1px solid rgba(201,148,42,0.3);
+  flex-shrink:0;
+}
+.user-badge-name{font-family:var(--font-ui);font-size:11px;font-weight:800;color:var(--gold2);white-space:nowrap;}
+.user-badge-icon{font-size:15px;}
 
 /* ===== LAYOUT ===== */
-.app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.main-layout{flex:1;display:flex;overflow:hidden}
+.app{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.main-layout{flex:1;display:flex;overflow:hidden;min-height:0;}
 
 /* ===== SIDEBAR ===== */
 .sidebar{
@@ -303,16 +320,6 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 .voice-ctrl-btn:hover{background:var(--gold);color:var(--ink)}
 .voice-ctrl-btn.primary{background:var(--gold);color:var(--ink);width:40px;height:40px;font-size:18px;}
 .voice-ctrl-btn.primary:hover{background:var(--gold2)}
-.voice-toggle{
-  display:flex;align-items:center;gap:7px;
-  padding:6px 14px;border-radius:20px;border:1.5px solid rgba(201,148,42,0.4);
-  background:transparent;color:rgba(232,184,75,0.8);
-  font-family:var(--font-ui);font-size:11px;font-weight:800;
-  cursor:pointer;transition:all 0.2s;flex-shrink:0;
-}
-.voice-toggle:hover,.voice-toggle.on{background:rgba(201,148,42,0.15);border-color:var(--gold);color:var(--gold2)}
-.voice-toggle-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background 0.2s;flex-shrink:0;}
-.voice-toggle.on .voice-toggle-dot{background:#4ade80}
 .voice-para-btn{
   display:inline-flex;align-items:center;gap:5px;
   margin-left:6px;padding:2px 8px;border-radius:8px;border:1px solid rgba(201,148,42,0.3);
@@ -452,13 +459,21 @@ function VoiceBar({ voice }) {
   );
 }
 
-// ─── Voice toggle button for header ──────────────────────────────────────────
+// ─── Voice toggle button for header — compact icon style ─────────────────────
 function VoiceToggle({ voice }) {
   const { voiceOn, toggleVoice } = voice;
   return (
-    <button className={`voice-toggle${voiceOn?' on':''}`} onClick={toggleVoice} title={voiceOn?'Turn voice off':'Turn voice on'}>
-      <span className="voice-toggle-dot"/>
-      {voiceOn ? '🔊 Voice On' : '🔇 Voice Off'}
+    <button
+      className="header-btn"
+      onClick={toggleVoice}
+      title={voiceOn ? 'Voice reading ON — click to turn off' : 'Voice reading OFF — click to turn on'}
+      style={{
+        borderColor: voiceOn ? 'rgba(201,148,42,0.7)' : 'rgba(201,148,42,0.3)',
+        color: voiceOn ? 'var(--gold2)' : 'rgba(232,184,75,0.5)',
+        background: voiceOn ? 'rgba(201,148,42,0.12)' : 'transparent',
+      }}
+    >
+      {voiceOn ? '🔊 Voice' : '🔇 Voice'}
     </button>
   );
 }
