@@ -147,8 +147,8 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;}
 .book-card{background:var(--white);border-radius:14px;border:1px solid var(--border);cursor:pointer;transition:all 0.25s;overflow:hidden;position:relative;box-shadow:0 2px 12px var(--shadow);}
 .book-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(44,24,16,0.25);border-color:var(--gold)}
-.book-cover{height:170px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-.book-cover svg{width:100%;height:100%;position:absolute;top:0;left:0}
+.book-cover{height:170px;position:relative;overflow:hidden;background:#0a1020;}
+.book-cover svg{position:absolute;top:0;left:0;width:100%;height:100%;display:block;}
 .book-cover-label{position:relative;z-index:2;font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);text-align:center;}
 .book-card-body{padding:14px}
 .book-card-category{font-family:var(--font-ui);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
@@ -189,9 +189,9 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 
 /* Story content */
 .story-content{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:0 4px 24px var(--shadow);overflow:hidden;margin-bottom:28px;}
-.story-scene{min-height:220px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0;}
-.story-scene svg{width:100%;height:220px;display:block;}
-.story-scene-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));padding:16px 20px 12px;font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.75);font-style:italic;font-weight:600;text-align:center;}
+.story-scene{width:100%;height:240px;position:relative;overflow:hidden;display:block;}
+.story-scene svg{display:block;width:100%;height:100%;position:absolute;top:0;left:0;}
+.story-scene-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.65));padding:20px 24px 14px;font-family:var(--font-ui);font-size:12px;color:rgba(255,255,255,0.85);font-style:italic;font-weight:600;text-align:center;z-index:2;}
 .story-chapter-header{padding:20px 28px 0;border-bottom:1px solid var(--parchment2);}
 .story-chapter-num{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
 .story-chapter-title{font-family:var(--font-title);font-size:22px;color:var(--ink);font-weight:600;padding-bottom:16px}
@@ -274,6 +274,60 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 .parent-card-value{font-family:var(--font-title);font-size:28px;color:var(--ink);font-weight:700}
 .parent-card-sub{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
 
+/* ===== VOICE PLAYER ===== */
+@keyframes voicePulse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.6)}}
+.voice-bar{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(135deg,#1a2a1a,#2c1810);
+  border-bottom:2px solid var(--gold);
+  padding:10px 28px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.35);
+}
+.voice-bar-icon{font-size:22px;flex-shrink:0}
+.voice-bar-text{flex:1;min-width:0;}
+.voice-bar-label{font-family:var(--font-ui);font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(232,184,75,0.6);margin-bottom:2px}
+.voice-bar-excerpt{font-family:var(--font-body);font-size:13px;color:rgba(253,246,227,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic}
+.voice-waves{display:flex;align-items:center;gap:3px;height:20px;margin-right:4px;flex-shrink:0;}
+.voice-wave{width:3px;border-radius:2px;background:var(--gold2);}
+.voice-wave.playing{animation:voicePulse 0.6s ease-in-out infinite;}
+.voice-wave.playing:nth-child(2){animation-delay:0.1s;}
+.voice-wave.playing:nth-child(3){animation-delay:0.2s;}
+.voice-wave.playing:nth-child(4){animation-delay:0.1s;}
+.voice-ctrl-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:rgba(201,148,42,0.2);color:var(--gold2);
+  font-size:16px;cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.voice-ctrl-btn:hover{background:var(--gold);color:var(--ink)}
+.voice-ctrl-btn.primary{background:var(--gold);color:var(--ink);width:40px;height:40px;font-size:18px;}
+.voice-ctrl-btn.primary:hover{background:var(--gold2)}
+.voice-toggle{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:20px;border:1.5px solid rgba(201,148,42,0.4);
+  background:transparent;color:rgba(232,184,75,0.8);
+  font-family:var(--font-ui);font-size:11px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.voice-toggle:hover,.voice-toggle.on{background:rgba(201,148,42,0.15);border-color:var(--gold);color:var(--gold2)}
+.voice-toggle-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background 0.2s;flex-shrink:0;}
+.voice-toggle.on .voice-toggle-dot{background:#4ade80}
+.voice-para-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-left:6px;padding:2px 8px;border-radius:8px;border:1px solid rgba(201,148,42,0.3);
+  background:rgba(201,148,42,0.08);color:var(--gold);
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  cursor:pointer;transition:all 0.18s;vertical-align:middle;
+}
+.voice-para-btn:hover{background:rgba(201,148,42,0.2);border-color:var(--gold)}
+.voice-speed-btn{
+  font-family:var(--font-ui);font-size:11px;font-weight:800;
+  padding:4px 10px;border-radius:10px;border:1.5px solid rgba(201,148,42,0.3);
+  background:transparent;color:rgba(232,184,75,0.7);cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.voice-speed-btn:hover{border-color:var(--gold);color:var(--gold2)}
+
 /* ===== LOADING & TOAST ===== */
 .loading-wrap{display:flex;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:12px}
 .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
@@ -293,7 +347,121 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── Voice Engine ─────────────────────────────────────────────────────────────
+function useVoice() {
+  const [voiceOn, setVoiceOn]     = useState(() => localStorage.getItem('qisas_voice') !== 'off');
+  const [speaking, setSpeaking]   = useState(false);
+  const [paused, setPaused]       = useState(false);
+  const [currentText, setCurrentText] = useState('');
+  const [rate, setRate]           = useState(0.92);
+  const utterRef = useRef(null);
+  const voiceRef = useRef(null);
+
+  // Pick best available voice on load
+  useEffect(() => {
+    function pickVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return;
+      // Preferred order: warm female English voices
+      const preferred = ['Samantha','Google UK English Female','Microsoft Zira','Karen','Moira','Tessa','Victoria','Alex'];
+      for (const name of preferred) {
+        const v = voices.find(v => v.name.includes(name));
+        if (v) { voiceRef.current = v; return; }
+      }
+      // Fallback: any English voice
+      voiceRef.current = voices.find(v => v.lang.startsWith('en')) || voices[0];
+    }
+    pickVoice();
+    window.speechSynthesis.onvoiceschanged = pickVoice;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
+
+  const stop = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
+    setPaused(false);
+    setCurrentText('');
+    utterRef.current = null;
+  }, []);
+
+  const speak = useCallback((text, onEnd) => {
+    if (!voiceOn) return;
+    window.speechSynthesis.cancel();
+    // Strip HTML tags and clean up
+    const clean = text.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    if (!clean) return;
+    setCurrentText(clean);
+    setSpeaking(true);
+    setPaused(false);
+    const u = new SpeechSynthesisUtterance(clean);
+    u.rate  = rate;
+    u.pitch = 1.05;
+    u.volume = 1;
+    if (voiceRef.current) u.voice = voiceRef.current;
+    u.onend = () => { setSpeaking(false); setPaused(false); setCurrentText(''); if(onEnd) onEnd(); };
+    u.onerror = () => { setSpeaking(false); setPaused(false); setCurrentText(''); };
+    utterRef.current = u;
+    window.speechSynthesis.speak(u);
+  }, [voiceOn, rate]);
+
+  const togglePause = useCallback(() => {
+    if (paused) { window.speechSynthesis.resume(); setPaused(false); }
+    else        { window.speechSynthesis.pause();  setPaused(true);  }
+  }, [paused]);
+
+  const toggleVoice = useCallback(() => {
+    const next = !voiceOn;
+    setVoiceOn(next);
+    localStorage.setItem('qisas_voice', next ? 'on' : 'off');
+    if (!next) stop();
+  }, [voiceOn, stop]);
+
+  const cycleRate = useCallback(() => {
+    const rates = [0.85, 0.92, 1.0, 1.1];
+    setRate(r => { const idx = rates.indexOf(r); return rates[(idx+1)%rates.length]; });
+  }, []);
+
+  return { voiceOn, speaking, paused, currentText, rate, speak, stop, togglePause, toggleVoice, cycleRate };
+}
+
+// ─── VoiceBar component (sticky player shown while speaking) ──────────────────
+function VoiceBar({ voice }) {
+  const { speaking, paused, currentText, rate, togglePause, stop, cycleRate } = voice;
+  if (!speaking) return null;
+  const excerpt = currentText.length > 80 ? currentText.slice(0,80)+'…' : currentText;
+  const rateLabel = rate === 0.85 ? '0.85×' : rate === 0.92 ? '0.92×' : rate === 1.0 ? '1×' : '1.1×';
+  return (
+    <div className="voice-bar">
+      <div className="voice-waves">
+        {[14,22,18,26,14].map((h,i) => (
+          <div key={i} className={`voice-wave${!paused?' playing':''}`} style={{height:h, animationDelay:`${i*0.12}s`}}/>
+        ))}
+      </div>
+      <div className="voice-bar-text">
+        <div className="voice-bar-label">Now Reading</div>
+        <div className="voice-bar-excerpt">{excerpt}</div>
+      </div>
+      <button className="voice-speed-btn" onClick={cycleRate} title="Change speed">{rateLabel}</button>
+      <button className="voice-ctrl-btn primary" onClick={togglePause} title={paused?'Resume':'Pause'}>
+        {paused ? '▶' : '⏸'}
+      </button>
+      <button className="voice-ctrl-btn" onClick={stop} title="Stop">⏹</button>
+    </div>
+  );
+}
+
+// ─── Voice toggle button for header ──────────────────────────────────────────
+function VoiceToggle({ voice }) {
+  const { voiceOn, toggleVoice } = voice;
+  return (
+    <button className={`voice-toggle${voiceOn?' on':''}`} onClick={toggleVoice} title={voiceOn?'Turn voice off':'Turn voice on'}>
+      <span className="voice-toggle-dot"/>
+      {voiceOn ? '🔊 Voice On' : '🔇 Voice Off'}
+    </button>
+  );
+}
 
 // ─── Auth Helpers ─────────────────────────────────────────────────────────────
 function getProfile(username) {
@@ -346,223 +514,418 @@ const CAT_COLORS = {
 };
 
 // ─── SVG Scene Illustrations ──────────────────────────────────────────────────
+// NOTE: All gradient IDs are unique per scene (no conflicts when multiple render).
+// No Math.random() — static star positions to prevent infinite re-render loops.
+// Each scene is a self-contained inline SVG that fills its container.
+
 function SceneDesert() {
+  // Starry night desert — for Prophets / Hijra / Hud stories
+  const stars = [
+    [40,18],[90,12],[140,22],[195,8],[250,16],[310,20],[370,10],[430,25],
+    [490,14],[550,20],[610,8],[670,18],[730,12],[790,22],[840,16],
+    [65,30],[170,35],[290,28],[415,32],[535,27],[655,33],[775,29]
+  ];
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0a1628"/>
+        <linearGradient id="gDesertSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#050d1a"/>
+          <stop offset="60%" stopColor="#0d2040"/>
           <stop offset="100%" stopColor="#1a3a5a"/>
         </linearGradient>
-        <linearGradient id="sand1" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="gDesertSand" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#c9942a"/>
-          <stop offset="100%" stopColor="#8b6014"/>
+          <stop offset="100%" stopColor="#6b4810"/>
         </linearGradient>
+        <radialGradient id="gDesertMoon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fffbe0"/>
+          <stop offset="100%" stopColor="#e8b84b"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#sky1)"/>
-      <circle cx="680" cy="40" r="22" fill="#e8b84b" opacity="0.9"/>
-      {[...Array(18)].map((_,i) => (
-        <circle key={i} cx={20+i*50+Math.sin(i)*20} cy={15+Math.cos(i*2)*12} r={1+Math.random()*1.5} fill="white" opacity={0.6+Math.random()*0.4}/>
-      ))}
-      <ellipse cx="430" cy="210" rx="500" ry="60" fill="url(#sand1)"/>
-      <ellipse cx="100" cy="210" rx="180" ry="45" fill="#b8841a"/>
-      <ellipse cx="760" cy="210" rx="160" ry="40" fill="#b8841a"/>
-      <path d="M 200 160 Q 220 100 240 160 Q 260 100 280 160" stroke="#c9942a" strokeWidth="2" fill="none" opacity="0.5"/>
-      <path d="M 560 150 Q 580 90 600 150 Q 620 90 640 150" stroke="#c9942a" strokeWidth="2" fill="none" opacity="0.5"/>
-      <rect x="395" y="120" width="8" height="60" fill="#2d4a2d" rx="2"/>
-      <ellipse cx="399" cy="105" rx="18" ry="25" fill="#2d6a2d"/>
-      <rect x="415" y="128" width="5" height="42" fill="#2d4a2d" rx="1"/>
-      <ellipse cx="417" cy="115" rx="12" ry="18" fill="#2d6a2d"/>
+      {/* Sky */}
+      <rect width="860" height="220" fill="url(#gDesertSky)"/>
+      {/* Moon with glow */}
+      <circle cx="700" cy="42" r="30" fill="rgba(232,184,75,0.15)"/>
+      <circle cx="700" cy="42" r="22" fill="url(#gDesertMoon)"/>
+      <circle cx="712" cy="36" r="10" fill="rgba(255,240,180,0.08)"/>
+      {/* Stars — static positions */}
+      {stars.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={i%3===0?1.8:1.2} fill="white" opacity={i%4===0?0.9:0.6}/>)}
+      {/* Sand dunes */}
+      <ellipse cx="430" cy="225" rx="520" ry="65" fill="url(#gDesertSand)"/>
+      <ellipse cx="80"  cy="220" rx="200" ry="50" fill="#a87020"/>
+      <ellipse cx="780" cy="218" rx="180" ry="45" fill="#a87020"/>
+      <ellipse cx="430" cy="215" rx="300" ry="35" fill="#b88828"/>
+      {/* Palm trees */}
+      <rect x="340" y="118" width="9" height="75" fill="#3a2a0a" rx="3"/>
+      <ellipse cx="344" cy="100" rx="22" ry="30" fill="#2d6a1a"/>
+      <ellipse cx="328" cy="112" rx="16" ry="10" fill="#3a7a20" transform="rotate(-20,328,112)"/>
+      <ellipse cx="360" cy="110" rx="16" ry="10" fill="#3a7a20" transform="rotate(20,360,110)"/>
+      <rect x="510" y="128" width="7" height="60" fill="#3a2a0a" rx="3"/>
+      <ellipse cx="513" cy="112" rx="18" ry="24" fill="#2d6a1a"/>
+      <ellipse cx="498" cy="122" rx="13" ry="8" fill="#3a7a20" transform="rotate(-15,498,122)"/>
+      <ellipse cx="528" cy="120" rx="13" ry="8" fill="#3a7a20" transform="rotate(15,528,120)"/>
+      {/* Camel silhouette */}
+      <ellipse cx="200" cy="175" rx="40" ry="18" fill="#5a3a10"/>
+      <rect x="170" y="155" width="12" height="28" fill="#5a3a10" rx="4"/>
+      <rect x="208" y="158" width="12" height="25" fill="#5a3a10" rx="4"/>
+      <ellipse cx="240" cy="165" rx="20" ry="14" fill="#5a3a10"/>
+      <rect x="242" y="148" width="8" height="22" fill="#5a3a10" rx="3"/>
+      <ellipse cx="248" cy="144" rx="10" ry="8" fill="#5a3a10"/>
+      <ellipse cx="200" cy="165" rx="12" ry="16" fill="#6a4820"/>
+      {/* Distant city walls */}
+      <rect x="550" y="152" width="180" height="40" fill="#1a2a3a" opacity="0.7"/>
+      <rect x="550" y="145" width="18" height="50" fill="#1a2a3a" opacity="0.7"/>
+      <rect x="590" y="148" width="15" height="47" fill="#1a2a3a" opacity="0.7"/>
+      <rect x="628" y="145" width="18" height="50" fill="#1a2a3a" opacity="0.7"/>
+      <rect x="710" y="148" width="18" height="45" fill="#1a2a3a" opacity="0.7"/>
     </svg>
   );
 }
 
 function SceneMosque() {
+  // Glowing mosque at dusk — for Ahmadiyyat / early Islam stories
+  const stars = [[50,15],[120,10],[200,20],[280,8],[360,18],[440,12],[520,22],[600,15],[680,9],[760,19],[820,14]];
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1a2a1a"/>
-          <stop offset="100%" stopColor="#2c4a2c"/>
+        <linearGradient id="gMosSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#050a14"/>
+          <stop offset="60%" stopColor="#0a1a28"/>
+          <stop offset="100%" stopColor="#162840"/>
         </linearGradient>
+        <linearGradient id="gMosDome" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1a4a3a"/>
+          <stop offset="100%" stopColor="#0a2a1a"/>
+        </linearGradient>
+        <radialGradient id="gMosGlow" cx="50%" cy="100%" r="60%">
+          <stop offset="0%" stopColor="rgba(201,148,42,0.25)"/>
+          <stop offset="100%" stopColor="rgba(201,148,42,0)"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#sky2)"/>
-      {[...Array(20)].map((_,i) => (
-        <circle key={i} cx={30+i*44} cy={20+Math.sin(i)*15} r={1.2} fill="white" opacity={0.7}/>
+      <rect width="860" height="220" fill="url(#gMosSky)"/>
+      {/* Stars */}
+      {stars.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={1.4} fill="white" opacity={0.7}/>)}
+      {/* Crescent moon */}
+      <circle cx="760" cy="35" r="16" fill="#e8b84b" opacity="0.9"/>
+      <circle cx="770" cy="30" r="13" fill="#0a1a28"/>
+      {/* Ground glow */}
+      <ellipse cx="430" cy="220" rx="350" ry="80" fill="url(#gMosGlow)"/>
+      {/* Ground */}
+      <rect x="0" y="195" width="860" height="25" fill="#0a1a10"/>
+      {/* Background trees */}
+      {[40,150,720,800].map((x,i) => (
+        <g key={i}>
+          <rect x={x-3} y="155" width="6" height="45" fill="#0a1a08"/>
+          <ellipse cx={x} cy="148" rx="14" ry="20" fill="#0a2a0a"/>
+        </g>
       ))}
-      <rect x="250" y="90" width="360" height="130" fill="#1a3a2a" rx="4"/>
-      <path d="M 340 90 Q 430 30 520 90" fill="#1a4a2a" stroke="#c9942a" strokeWidth="2"/>
-      <rect x="415" y="30" width="6" height="70" fill="#c9942a"/>
-      <path d="M 412 25 Q 418 15 424 25 L 422 30 L 412 30 Z" fill="#e8b84b"/>
-      <rect x="310" y="100" width="12" height="90" fill="#1a2a1a" rx="2"/>
-      <path d="M 310 100 Q 316 80 322 100" fill="#1a4a3a"/>
-      <rect x="538" y="100" width="12" height="90" fill="#1a2a1a" rx="2"/>
-      <path d="M 538 100 Q 544 80 550 100" fill="#1a4a3a"/>
-      <rect x="360" y="140" width="40" height="80" fill="#0a2a1a" rx="3"/>
-      <path d="M 360 140 Q 380 120 400 140" fill="#0a3a2a"/>
-      <rect x="460" y="140" width="40" height="80" fill="#0a2a1a" rx="3"/>
-      <path d="M 460 140 Q 480 120 500 140" fill="#0a3a2a"/>
-      <rect x="0" y="200" width="860" height="20" fill="#1a3a1a"/>
-      {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
-        <rect key={i} x={i*70} y="190" width="60" height="30" fill={i%2===0?"#0a2a1a":"#122a1a"} rx="1"/>
+      {/* Main mosque body */}
+      <rect x="240" y="110" width="380" height="90" fill="#122a1e" rx="2"/>
+      {/* Arched windows */}
+      {[270,340,410,480,550].map((x,i) => (
+        <g key={i}>
+          <rect x={x} y="145" width="22" height="35" fill="rgba(201,148,42,0.15)" rx="2"/>
+          <path d={`M ${x} 145 Q ${x+11} 132 ${x+22} 145`} fill="rgba(201,148,42,0.2)"/>
+        </g>
       ))}
-      <rect x="200" y="60" width="460" height="145" fill="none" stroke="#c9942a" strokeWidth="1.5" opacity="0.3" rx="4"/>
+      {/* Main dome */}
+      <path d="M 340 110 Q 430 38 520 110" fill="url(#gMosDome)" stroke="#c9942a" strokeWidth="1.5"/>
+      <ellipse cx="430" cy="110" rx="90" ry="12" fill="#0f2218"/>
+      {/* Dome lantern */}
+      <rect x="426" y="36" width="8" height="16" fill="#c9942a"/>
+      <circle cx="430" cy="32" r="6" fill="#e8b84b"/>
+      <circle cx="430" cy="32" r="10" fill="rgba(232,184,75,0.2)"/>
+      {/* Left minaret */}
+      <rect x="248" y="60" width="16" height="95" fill="#0e2218" rx="2"/>
+      <path d="M 248 60 Q 256 44 264 60" fill="#0e2a1a"/>
+      <rect x="252" y="40" width="8" height="22" fill="#c9942a" rx="1"/>
+      <circle cx="256" cy="37" r="5" fill="#e8b84b"/>
+      {/* Right minaret */}
+      <rect x="596" y="60" width="16" height="95" fill="#0e2218" rx="2"/>
+      <path d="M 596 60 Q 604 44 612 60" fill="#0e2a1a"/>
+      <rect x="600" y="40" width="8" height="22" fill="#c9942a" rx="1"/>
+      <circle cx="604" cy="37" r="5" fill="#e8b84b"/>
+      {/* Main gate arch */}
+      <rect x="404" y="145" width="52" height="55" fill="#0a1a10" rx="2"/>
+      <path d="M 404 145 Q 430 122 456 145" fill="#0a2218"/>
+      {/* Gold trim line */}
+      <line x1="240" y1="110" x2="620" y2="110" stroke="#c9942a" strokeWidth="1.5" opacity="0.6"/>
+      {/* Reflection pool */}
+      <ellipse cx="430" cy="205" rx="160" ry="10" fill="rgba(201,148,42,0.1)"/>
     </svg>
   );
 }
 
 function SceneBattle() {
+  // Dramatic battle scene at dawn — for companions / Umar / Umme Ummaarah stories
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1a0a0a"/>
-          <stop offset="100%" stopColor="#3a1a1a"/>
+        <linearGradient id="gBatSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0a0505"/>
+          <stop offset="40%" stopColor="#2a0a0a"/>
+          <stop offset="100%" stopColor="#5a1a0a"/>
         </linearGradient>
+        <radialGradient id="gBatSun" cx="50%" cy="100%" r="50%">
+          <stop offset="0%" stopColor="rgba(220,100,20,0.7)"/>
+          <stop offset="100%" stopColor="rgba(220,100,20,0)"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#sky3)"/>
-      <ellipse cx="200" cy="60" rx="80" ry="30" fill="#2a1a0a" opacity="0.8"/>
-      <ellipse cx="600" cy="40" rx="100" ry="35" fill="#2a1a0a" opacity="0.7"/>
-      <ellipse cx="430" cy="80" rx="120" ry="40" fill="#3a1a0a" opacity="0.6"/>
-      <rect x="0" y="180" width="860" height="40" fill="#2a1a0a"/>
-      <path d="M 0 180 Q 100 160 200 175 Q 300 190 430 170 Q 560 155 700 175 Q 800 190 860 170 L 860 220 L 0 220 Z" fill="#1a0a0a"/>
-      <line x1="150" y1="120" x2="200" y2="60" stroke="#c9942a" strokeWidth="3" strokeLinecap="round"/>
-      <circle cx="195" cy="55" r="8" fill="none" stroke="#e8b84b" strokeWidth="2"/>
-      <line x1="350" y1="130" x2="310" y2="70" stroke="#888" strokeWidth="3" strokeLinecap="round"/>
-      <line x1="500" y1="125" x2="540" y2="65" stroke="#c9942a" strokeWidth="3" strokeLinecap="round"/>
-      <circle cx="545" cy="60" r="8" fill="none" stroke="#e8b84b" strokeWidth="2"/>
-      <line x1="700" y1="130" x2="660" y2="70" stroke="#888" strokeWidth="3" strokeLinecap="round"/>
-      <circle cx="430" cy="30" r="15" fill="#e8b84b" opacity="0.8"/>
-      <path d="M 428 22 L 430 14 L 432 22 L 438 22 L 433 27 L 435 35 L 430 30 L 425 35 L 427 27 L 422 22 Z" fill="#c9942a"/>
+      <rect width="860" height="220" fill="url(#gBatSky)"/>
+      {/* Dramatic horizon glow */}
+      <ellipse cx="430" cy="220" rx="500" ry="100" fill="url(#gBatSun)"/>
+      {/* Battle dust clouds */}
+      <ellipse cx="200" cy="70" rx="110" ry="35" fill="#2a1505" opacity="0.85"/>
+      <ellipse cx="630" cy="55" rx="130" ry="40" fill="#2a1505" opacity="0.75"/>
+      <ellipse cx="430" cy="90" rx="150" ry="45" fill="#3a1a08" opacity="0.65"/>
+      {/* Ground */}
+      <rect x="0" y="185" width="860" height="35" fill="#1a0a05"/>
+      <path d="M 0 185 Q 120 170 250 180 Q 400 190 550 172 Q 700 158 860 178 L 860 220 L 0 220 Z" fill="#100805"/>
+      {/* Banners / flags */}
+      <rect x="160" y="95" width="5" height="75" fill="#8a6820"/>
+      <path d="M 165 95 L 165 118 L 188 106 Z" fill="#c9942a"/>
+      <rect x="430" y="80" width="5" height="90" fill="#8a6820"/>
+      <path d="M 435 80 L 435 105 L 460 92 Z" fill="#e8b84b"/>
+      <rect x="680" y="98" width="5" height="72" fill="#8a6820"/>
+      <path d="M 685 98 L 685 120 L 706 108 Z" fill="#c9942a"/>
+      {/* Spears / swords (silhouettes) */}
+      {[[120,155,155,88],[185,150,218,82],[280,145,260,78],[360,148,385,75],[490,152,470,80],[565,148,590,76],[645,152,625,82],[720,155,748,85],[790,150,775,83]].map(([x1,y1,x2,y2],i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={i%2===0?"#c9942a":"#888"} strokeWidth={i%3===0?3:2} strokeLinecap="round"/>
+      ))}
+      {/* Shield shapes */}
+      {[[200,158],[350,162],[510,160],[670,158]].map(([x,y],i) => (
+        <path key={i} d={`M ${x} ${y-12} Q ${x+10} ${y-16} ${x+20} ${y-12} L ${x+20} ${y+4} Q ${x+10} ${y+10} ${x} ${y+4} Z`} fill="#3a2a18" stroke="#6a4a20" strokeWidth="1"/>
+      ))}
+      {/* Gold victory star overhead */}
+      <circle cx="430" cy="28" r="18" fill="rgba(232,184,75,0.15)"/>
+      <path d="M430 14 L433 22 L442 22 L435 27 L438 36 L430 31 L422 36 L425 27 L418 22 L427 22 Z" fill="#e8b84b" opacity="0.9"/>
     </svg>
   );
 }
 
 function SceneGarden() {
+  // Moonlit garden with flowers — for kindness / values / garden stories
+  const starPos = [[60,18],[140,12],[230,20],[310,9],[400,16],[490,22],[575,11],[655,19],[740,14],[820,20]];
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="sky4" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0a2a3a"/>
-          <stop offset="100%" stopColor="#1a4a5a"/>
+        <linearGradient id="gGarSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#080d1a"/>
+          <stop offset="55%" stopColor="#0d1e2e"/>
+          <stop offset="100%" stopColor="#162a18"/>
         </linearGradient>
-        <linearGradient id="ground4" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1a3a1a"/>
-          <stop offset="100%" stopColor="#0a2a0a"/>
+        <linearGradient id="gGarGround" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1a3a14"/>
+          <stop offset="100%" stopColor="#0a1a08"/>
         </linearGradient>
+        <radialGradient id="gGarMoon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fffdf0"/>
+          <stop offset="100%" stopColor="#e8d080"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#sky4)"/>
-      <circle cx="430" cy="50" r="35" fill="#e8b84b" opacity="0.3"/>
-      <circle cx="430" cy="50" r="20" fill="#e8b84b" opacity="0.6"/>
-      {[...Array(12)].map((_,i) => (
-        <circle key={i} cx={60+i*66} cy={25+Math.sin(i*1.3)*10} r="1.5" fill="white" opacity="0.6"/>
-      ))}
-      <rect x="0" y="170" width="860" height="50" fill="url(#ground4)"/>
-      {[80,200,340,480,620,760].map((x,i) => (
+      <rect width="860" height="220" fill="url(#gGarSky)"/>
+      {/* Moonlight glow on ground */}
+      <ellipse cx="430" cy="220" rx="300" ry="80" fill="rgba(232,208,100,0.08)"/>
+      {/* Stars */}
+      {starPos.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={i%3===0?1.8:1.1} fill="white" opacity={0.65}/>)}
+      {/* Moon */}
+      <circle cx="680" cy="38" r="28" fill="url(#gGarMoon)" opacity="0.9"/>
+      <circle cx="692" cy="30" r="18" fill="rgba(255,253,240,0.15)"/>
+      {/* Ground */}
+      <rect x="0" y="172" width="860" height="48" fill="url(#gGarGround)"/>
+      <path d="M 0 172 Q 180 158 360 168 Q 510 178 680 162 Q 780 152 860 165 L 860 220 L 0 220 Z" fill="#0d2008"/>
+      {/* Trees */}
+      {[[90,115],[220,108],[370,120],[560,112],[700,118],[820,115]].map(([x,y],i) => (
         <g key={i}>
-          <rect x={x} y={110+i%2*10} width="7" height={80-i%2*10} fill="#1a3a0a" rx="2"/>
-          <ellipse cx={x+3} cy={100+i%2*10} rx={22+i%3*5} ry={30+i%2*8} fill="#2d6a2d"/>
-          <ellipse cx={x+3} cy={95+i%2*10} rx={16+i%3*3} ry={22+i%2*5} fill="#3a8a3a"/>
+          <rect x={x-4} y={y} width="8" height={172-y+8} fill="#1a2a08" rx="3"/>
+          <ellipse cx={x} cy={y} rx={24+i%3*5} ry={32+i%2*8} fill={i%2===0?"#1e4a14":"#26601a"}/>
+          <ellipse cx={x-6} cy={y+10} rx={16+i%2*4} ry={20+i%3*4} fill={i%2===0?"#265a18":"#1c4010"}/>
         </g>
       ))}
-      <path d="M 0 170 Q 200 155 430 165 Q 660 175 860 160 L 860 220 L 0 220 Z" fill="#0a2a0a"/>
-      <circle cx="200" cy="95" r="6" fill="#e8b84b" opacity="0.5"/>
-      <circle cx="580" cy="80" r="5" fill="#e8b84b" opacity="0.4"/>
-      <circle cx="380" cy="120" r="4" fill="#e8b84b" opacity="0.6"/>
+      {/* Flowers */}
+      {[[160,168],[300,172],[440,166],[590,170],[730,168]].map(([x,y],i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r="6" fill={["#e8b84b","#c9942a","#e8d070","#d4a030","#f0c040"][i]} opacity="0.85"/>
+          <circle cx={x} cy={y} r="3" fill="white" opacity="0.6"/>
+        </g>
+      ))}
+      {/* Path / stream */}
+      <path d="M 0 185 Q 200 178 430 182 Q 640 186 860 180" stroke="rgba(201,148,42,0.2)" strokeWidth="8" fill="none"/>
     </svg>
   );
 }
 
 function SceneScroll() {
+  // Illuminated manuscript / scroll — for Khadijah, values, knowledge stories
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="bg5" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#1a2a40"/>
-          <stop offset="100%" stopColor="#2c1810"/>
+        <linearGradient id="gScrollBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#10182e"/>
+          <stop offset="50%" stopColor="#1a1810"/>
+          <stop offset="100%" stopColor="#0e1a28"/>
         </linearGradient>
+        <linearGradient id="gScrollPaper" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fdf6e0"/>
+          <stop offset="100%" stopColor="#f0e0c0"/>
+        </linearGradient>
+        <radialGradient id="gScrollLight" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="rgba(232,184,75,0.15)"/>
+          <stop offset="100%" stopColor="rgba(232,184,75,0)"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#bg5)"/>
-      {[...Array(6)].map((_,i) => (
-        <line key={i} x1="0" y1={30+i*32} x2="860" y2={30+i*32} stroke="rgba(201,148,42,0.08)" strokeWidth="1"/>
+      {/* Background */}
+      <rect width="860" height="220" fill="url(#gScrollBg)"/>
+      {/* Geometric Islamic border pattern */}
+      {[0,1,2,3,4,5].map(i => (
+        <line key={i} x1="0" y1={20+i*34} x2="860" y2={20+i*34} stroke="rgba(201,148,42,0.07)" strokeWidth="1"/>
       ))}
-      <rect x="270" y="25" width="320" height="170" fill="#f5e6c8" rx="8" opacity="0.95"/>
-      <rect x="263" y="22" width="10" height="176" fill="#c9942a" rx="5"/>
-      <rect x="587" y="22" width="10" height="176" fill="#c9942a" rx="5"/>
-      <rect x="280" y="35" width="300" height="150" fill="none" stroke="#d4b896" strokeWidth="1" rx="4"/>
-      {[0,1,2,3,4,5,6].map(i => (
-        <rect key={i} x="295" y={50+i*17} width={100+Math.sin(i)*40} height="5" fill="#2c1810" rx="2" opacity="0.5"/>
+      {[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(i => (
+        <line key={i} x1={i*62} y1="0" x2={i*62} y2="220" stroke="rgba(201,148,42,0.05)" strokeWidth="1"/>
       ))}
-      <rect x="295" y="50" width="155" height="7" fill="#c9942a" rx="2" opacity="0.7"/>
-      <circle cx="430" cy="155" r="18" fill="none" stroke="#c9942a" strokeWidth="2"/>
-      <path d="M 422 148 Q 430 138 438 148 Q 446 158 430 168 Q 414 158 422 148 Z" fill="#c9942a" opacity="0.6"/>
-      <circle cx="140" cy="110" r="45" fill="none" stroke="rgba(201,148,42,0.3)" strokeWidth="1"/>
-      <text x="140" y="105" textAnchor="middle" fontFamily="serif" fontSize="38" fill="rgba(201,148,42,0.5)">☪</text>
-      <circle cx="720" cy="110" r="45" fill="none" stroke="rgba(201,148,42,0.3)" strokeWidth="1"/>
-      <text x="720" y="105" textAnchor="middle" fontFamily="serif" fontSize="38" fill="rgba(201,148,42,0.5)">☪</text>
+      {/* Glow behind scroll */}
+      <ellipse cx="430" cy="110" rx="220" ry="130" fill="url(#gScrollLight)"/>
+      {/* Scroll body */}
+      <rect x="250" y="18" width="360" height="184" fill="url(#gScrollPaper)" rx="6"/>
+      {/* Scroll rollers */}
+      <rect x="240" y="14" width="14" height="192" fill="#b87820" rx="7"/>
+      <rect x="244" y="10" width="6" height="200" fill="#c9942a" rx="3"/>
+      <ellipse cx="247" cy="10" rx="8" ry="5" fill="#e8b84b"/>
+      <ellipse cx="247" cy="210" rx="8" ry="5" fill="#e8b84b"/>
+      <rect x="606" y="14" width="14" height="192" fill="#b87820" rx="7"/>
+      <rect x="610" y="10" width="6" height="200" fill="#c9942a" rx="3"/>
+      <ellipse cx="613" cy="10" rx="8" ry="5" fill="#e8b84b"/>
+      <ellipse cx="613" cy="210" rx="8" ry="5" fill="#e8b84b"/>
+      {/* Inner border of scroll */}
+      <rect x="262" y="28" width="336" height="164" fill="none" stroke="#d4b040" strokeWidth="1.5" rx="3"/>
+      {/* Title line (gold) */}
+      <rect x="278" y="42" width="200" height="8" fill="#c9942a" rx="4" opacity="0.8"/>
+      {/* Text lines */}
+      {[60,78,96,114,132,150].map((y,i) => (
+        <rect key={i} x="278" y={y} width={120+i%3*40} height="5" fill="#2c1810" rx="2" opacity={0.3+i*0.05}/>
+      ))}
+      {[60,78,96,114].map((y,i) => (
+        <rect key={i} x={410+i*5} y={y} width={80-i*10} height="5" fill="#2c1810" rx="2" opacity="0.25"/>
+      ))}
+      {/* Decorative seal */}
+      <circle cx="430" cy="162" r="22" fill="none" stroke="#c9942a" strokeWidth="2"/>
+      <circle cx="430" cy="162" r="16" fill="rgba(201,148,42,0.1)"/>
+      <path d="M430 148 l3 8 l9 0 l-7 5 l3 8 l-8-5 l-8 5 l3-8 l-7-5 l9 0 Z" fill="#c9942a" opacity="0.7"/>
+      {/* Islamic calligraphy-style decorations */}
+      <text x="140" y="118" textAnchor="middle" fontFamily="serif" fontSize="42" fill="rgba(201,148,42,0.35)">☪</text>
+      <text x="720" y="118" textAnchor="middle" fontFamily="serif" fontSize="42" fill="rgba(201,148,42,0.35)">☪</text>
+      {/* Corner ornaments */}
+      {[[262,28],[598,28],[262,192],[598,192]].map(([x,y],i) => (
+        <circle key={i} cx={x} cy={y} r="5" fill="#c9942a" opacity="0.6"/>
+      ))}
     </svg>
   );
 }
 
 function SceneSunrise() {
+  // Qadian sunrise — for Promised Messiah / Promised Son stories
+  const starPos = [[30,22],[100,15],[185,25],[270,12],[355,20],[445,14],[535,22],[620,10],[710,18],[800,24]];
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0a1428"/>
-          <stop offset="50%" stopColor="#1a2a4a"/>
-          <stop offset="100%" stopColor="#c97030"/>
+        <linearGradient id="gSunSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#06101e"/>
+          <stop offset="35%" stopColor="#0e1e35"/>
+          <stop offset="65%" stopColor="#1e2a4a"/>
+          <stop offset="100%" stopColor="#8a3a10"/>
         </linearGradient>
-        <radialGradient id="sun" cx="50%" cy="80%" r="40%">
-          <stop offset="0%" stopColor="#e8b84b" stopOpacity="0.9"/>
-          <stop offset="100%" stopColor="#c97030" stopOpacity="0"/>
+        <radialGradient id="gSunGlow" cx="50%" cy="95%" r="55%">
+          <stop offset="0%" stopColor="rgba(232,140,40,0.9)"/>
+          <stop offset="40%" stopColor="rgba(200,100,20,0.4)"/>
+          <stop offset="100%" stopColor="rgba(200,100,20,0)"/>
+        </radialGradient>
+        <radialGradient id="gSunDisc" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fffbe0"/>
+          <stop offset="60%" stopColor="#e8b030"/>
+          <stop offset="100%" stopColor="#c87820"/>
         </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#dawn)"/>
-      <ellipse cx="430" cy="220" rx="280" ry="80" fill="url(#sun)"/>
-      <ellipse cx="430" cy="200" rx="40" ry="18" fill="#e8b84b" opacity="0.8"/>
-      {[-3,-2,-1,0,1,2,3].map((i,idx) => (
-        <line key={idx} x1={430+Math.sin(i*0.5)*42} y1={200+Math.cos(i*0.5)*18} x2={430+Math.sin(i*0.5)*70} y2={200+Math.cos(i*0.5)*30} stroke="#e8b84b" strokeWidth="2" opacity="0.6"/>
+      <rect width="860" height="220" fill="url(#gSunSky)"/>
+      {/* Stars fading into dawn */}
+      {starPos.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={1.3} fill="white" opacity={0.5}/>)}
+      {/* Horizon radiance */}
+      <ellipse cx="430" cy="220" rx="480" ry="120" fill="url(#gSunGlow)"/>
+      {/* Rising sun disc */}
+      <ellipse cx="430" cy="198" rx="50" ry="22" fill="url(#gSunDisc)" opacity="0.9"/>
+      {/* Sun rays */}
+      {[-70,-50,-35,-20,-5,5,20,35,50,70].map((angle,i) => {
+        const rad = angle * Math.PI / 180;
+        return <line key={i} x1={430+Math.sin(rad)*52} y1={198-Math.cos(rad)*22} x2={430+Math.sin(rad)*80} y2={198-Math.cos(rad)*34} stroke="#e8b030" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>;
+      })}
+      {/* Qadian village silhouette */}
+      <path d="M 0 178 L 0 190 L 60 190 L 60 178 L 55 178 L 55 170 L 52 170 L 52 165 L 48 165 L 48 170 L 45 170 L 45 178 Z" fill="#0a0a08"/>
+      <path d="M 70 175 L 70 190 L 140 190 L 140 175 L 128 175 L 128 168 L 124 160 L 120 168 L 116 168 L 116 175 Z" fill="#0a0a08"/>
+      <rect x="150" y="170" width="60" height="20" fill="#0a0a08"/>
+      <rect x="168" y="158" width="8" height="12" fill="#0a0a08"/>
+      <path d="M 166 158 Q 172 150 178 158" fill="#0a0a08"/>
+      {/* Trees */}
+      {[[240,155],[295,160],[370,152],[480,158],[540,154],[610,160],[680,152],[740,158],[800,155]].map(([x,y],i) => (
+        <g key={i}>
+          <rect x={x-3} y={y+18} width="6" height={172-y} fill="#0a0a08"/>
+          <ellipse cx={x} cy={y+10} rx={i%3===0?18:14} ry={i%3===0?24:18} fill="#0a1208"/>
+        </g>
       ))}
-      {[...Array(15)].map((_,i) => (
-        <circle key={i} cx={20+i*58} cy={20+Math.sin(i)*10} r="1.2" fill="white" opacity={0.4+Math.sin(i)*0.3}/>
-      ))}
-      <path d="M 0 175 Q 150 150 300 165 Q 430 175 580 160 Q 700 148 860 165 L 860 220 L 0 220 Z" fill="#1a1a0a"/>
-      <rect x="385" y="130" width="8" height="70" fill="#1a2a0a" rx="2"/>
-      <ellipse cx="389" cy="118" rx="20" ry="25" fill="#1a3a0a"/>
-      <rect x="405" y="140" width="5" height="50" fill="#1a2a0a" rx="1"/>
-      <ellipse cx="407" cy="130" rx="13" ry="17" fill="#1a3a0a"/>
+      {/* Ground */}
+      <rect x="0" y="188" width="860" height="32" fill="#060808"/>
+      {/* Light beams across horizon */}
+      <line x1="430" y1="198" x2="0"   y2="185" stroke="rgba(232,180,50,0.12)" strokeWidth="40"/>
+      <line x1="430" y1="198" x2="860" y2="185" stroke="rgba(232,180,50,0.12)" strokeWidth="40"/>
     </svg>
   );
 }
 
 function SceneWomen() {
+  // Night sky with dignified silhouettes — for women of Islam stories
+  const starPos = [[45,14],[100,22],[165,8],[235,18],[305,12],[375,20],[450,8],[525,16],[600,22],[670,10],[740,18],[810,14]];
   return (
-    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{display:'block',width:'100%',height:'100%'}}>
       <defs>
-        <linearGradient id="sky6" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2a1a2a"/>
-          <stop offset="100%" stopColor="#4a1a3a"/>
+        <linearGradient id="gWomSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0e0814"/>
+          <stop offset="55%" stopColor="#1a0e22"/>
+          <stop offset="100%" stopColor="#280e1a"/>
         </linearGradient>
+        <radialGradient id="gWomMoon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff8e0"/>
+          <stop offset="100%" stopColor="#e8d060"/>
+        </radialGradient>
       </defs>
-      <rect width="860" height="220" fill="url(#sky6)"/>
-      {[...Array(16)].map((_,i) => (
-        <circle key={i} cx={30+i*55} cy={18+Math.sin(i*1.7)*12} r="1.4" fill="white" opacity="0.6"/>
-      ))}
-      <rect x="0" y="185" width="860" height="35" fill="#1a0a1a"/>
-      {[140,280,430,580,720].map((x,i) => (
-        <g key={i}>
-          <ellipse cx={x} cy="220" rx="22" ry="8" fill="#2a0a2a" opacity="0.5"/>
-          <rect x={x-6} y={130+i%2*10} width="12" height={90-i%2*10} fill="#3a1a3a" rx="6"/>
-          <circle cx={x} cy={122+i%2*10} r="16" fill="#c9942a" opacity="0.4"/>
-          <path d={`M ${x-14} ${130+i%2*10} Q ${x} ${108+i%2*10} ${x+14} ${130+i%2*10}`} fill="#4a1a4a"/>
-        </g>
-      ))}
-      <circle cx="430" cy="45" r="25" fill="#e8b84b" opacity="0.7"/>
-      <path d="M 415 38 L 430 22 L 445 38 L 440 43 L 430 36 L 420 43 Z" fill="#c9942a"/>
-      {[0,60,120,180,240,300].map((angle,i) => (
-        <circle key={i} cx={430+Math.cos(angle*Math.PI/180)*35} cy={45+Math.sin(angle*Math.PI/180)*35} r="2" fill="#e8b84b" opacity="0.5"/>
-      ))}
+      <rect width="860" height="220" fill="url(#gWomSky)"/>
+      {/* Stars */}
+      {starPos.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={i%4===0?2:1.3} fill="white" opacity={0.7}/>)}
+      {/* Full moon */}
+      <circle cx="680" cy="40" r="28" fill="rgba(232,208,80,0.2)"/>
+      <circle cx="680" cy="40" r="22" fill="url(#gWomMoon)" opacity="0.9"/>
+      {/* Moon glow on ground */}
+      <ellipse cx="680" cy="220" rx="200" ry="60" fill="rgba(232,208,80,0.06)"/>
+      {/* Ground */}
+      <rect x="0" y="188" width="860" height="32" fill="#0a0510"/>
+      <path d="M 0 188 Q 200 178 430 184 Q 650 190 860 180 L 860 220 L 0 220 Z" fill="#080310"/>
+      {/* Silhouetted female figures in hijab — dignified */}
+      {[100,230,360,500,640,760].map((x,i) => {
+        const h = 58 + i%3*6;
+        const top = 188 - h;
+        return (
+          <g key={i}>
+            {/* Body — abaya/robe shape */}
+            <path d={`M ${x-12} 188 Q ${x-10} ${top+22} ${x} ${top+18} Q ${x+10} ${top+22} ${x+12} 188 Z`} fill="#1a0a20"/>
+            {/* Head with hijab */}
+            <ellipse cx={x} cy={top+10} rx="12" ry="11" fill="#1a0a20"/>
+            <path d={`M ${x-14} ${top+16} Q ${x-4} ${top+4} ${x+14} ${top+16}`} fill="#140818"/>
+            {/* Face — tiny golden oval */}
+            <ellipse cx={x} cy={top+11} rx="5" ry="6" fill="#c9942a" opacity="0.25"/>
+          </g>
+        );
+      })}
+      {/* Gold Islamic star pattern decorations */}
+      <text x="430" y="55" textAnchor="middle" fontFamily="serif" fontSize="28" fill="rgba(201,148,42,0.3)">✦ ✦ ✦</text>
+      {/* Soft light rays from moon */}
+      <line x1="680" y1="62" x2="430" y2="188" stroke="rgba(232,208,80,0.05)" strokeWidth="80"/>
     </svg>
   );
 }
@@ -1235,14 +1598,14 @@ function Quiz({ questions, onComplete, title, isChapter }) {
 }
 
 // ─── BookReader ───────────────────────────────────────────────────────────────
-function BookReader({ book, profile, username, onBack, onProfileUpdate }) {
+function BookReader({ book, profile, username, onBack, onProfileUpdate, voice }) {
   const [curChapter, setCurChapter] = useState(0);
   const [mode, setMode] = useState('read');
   const [completedChapters, setCompletedChapters] = useState(profile.chaptersCompleted?.[book.id] || []);
   const ch = book.chapters[curChapter];
   const allDone = completedChapters.filter(c=>c!=='final').length >= book.chapters.length;
 
-  useEffect(() => { window.scrollTo(0,0); }, [curChapter, mode]);
+  useEffect(() => { window.scrollTo(0,0); if(voice) voice.stop(); }, [curChapter, mode]);
 
   function markChapterDone(chId) {
     if (completedChapters.includes(chId)) return;
@@ -1324,16 +1687,41 @@ function BookReader({ book, profile, username, onBack, onProfileUpdate }) {
 
       {mode === 'read' && (
         <div className="story-content page-enter">
+          {/* Voice sticky bar */}
+          {voice && <VoiceBar voice={voice}/>}
           <div className="story-scene">
             <SceneComp/>
             <div className="story-scene-caption">{ch.sceneCaption}</div>
           </div>
           <div className="story-chapter-header">
             <div className="story-chapter-num">Chapter {ch.num}</div>
-            <div className="story-chapter-title">{ch.title}</div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8,paddingBottom:16}}>
+              <div className="story-chapter-title" style={{paddingBottom:0,marginBottom:0}}>{ch.title}</div>
+              {voice && voice.voiceOn && (
+                <button className="voice-ctrl-btn primary" style={{flexShrink:0}}
+                  onClick={() => {
+                    const fullText = ch.content.map(p => p.replace(/<[^>]+>/g,'')).join('. ');
+                    voice.speak(fullText);
+                  }}
+                  title="Read entire chapter aloud">
+                  🔊
+                </button>
+              )}
+            </div>
           </div>
           <div className="story-body">
-            {ch.content.map((para,i) => <p key={i} dangerouslySetInnerHTML={{__html: para}}/>)}
+            {ch.content.map((para,i) => (
+              <p key={i} style={{position:'relative'}}>
+                <span dangerouslySetInnerHTML={{__html: para}}/>
+                {voice && voice.voiceOn && (
+                  <button className="voice-para-btn"
+                    onClick={() => voice.speak(para)}
+                    title="Read this paragraph aloud">
+                    🔊
+                  </button>
+                )}
+              </p>
+            ))}
           </div>
           <div className="lesson-box">
             <div className="lesson-box-title">📖 What We Learned</div>
@@ -1421,7 +1809,7 @@ function Library({ profile, onOpenBook, activeCat, setActiveCat }) {
               <div key={book.id} className="book-card fade-up" onClick={() => onOpenBook(book)}>
                 {book.isNew && !done && <span className="book-card-badge new">NEW</span>}
                 {done && <span className="book-card-badge done">✓ Done</span>}
-                <div className="book-cover" style={{background: book.coverColor}}>
+                <div className="book-cover">
                   <SceneComp/>
                 </div>
                 <div className="book-card-body">
@@ -1533,7 +1921,7 @@ function App() {
     return u ? getProfile(u) : {};
   });
 
-  // Navigation state
+  const voice = useVoice();
   const [screen, setScreen] = useState('library');
   const [activeBook, setActiveBook] = useState(null);
   const [activeCat, setActiveCat] = useState('all');   // FIX: lifted to App so sidebar can control it
@@ -1573,6 +1961,7 @@ function App() {
 
   // ── FIX: Sign Out — clears user state and goes back to AUTH (not API key) ──
   function logout() {
+    voice.stop();
     localStorage.removeItem('qisas_user');
     setUsername('');
     setIsParent(false);
@@ -1685,6 +2074,7 @@ function App() {
             <button className={`header-btn${screen==='parent'?' active':''}`}
               onClick={()=>setScreen('parent')}>📊 Overview</button>
           )}
+          <VoiceToggle voice={voice}/>
           <div className="user-badge">
             <span className="user-badge-icon">{isParent?'👨':'📖'}</span>
             <span className="user-badge-name">{profile.name || username}</span>
@@ -1771,8 +2161,9 @@ function App() {
           )}
           {screen === 'reader' && activeBook && (
             <BookReader book={activeBook} profile={profile} username={username}
-              onBack={()=>{setScreen('library');setActiveBook(null)}}
-              onProfileUpdate={handleProfileUpdate}/>
+              onBack={()=>{setScreen('library');setActiveBook(null);voice.stop();}}
+              onProfileUpdate={handleProfileUpdate}
+              voice={voice}/>
           )}
           {screen === 'badges' && <BadgesScreen profile={profile}/>}
           {screen === 'parent' && <ParentHub allProfiles={allChildProfiles}/>}
