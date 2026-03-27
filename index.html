@@ -318,12 +318,74 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 .badge-desc{font-family:var(--font-ui);font-size:10px;color:var(--muted);font-weight:600;line-height:1.4}
 
 /* ===== PARENT HUB ===== */
-.parent-wrap{padding:28px 32px}
-.parent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:28px}
-.parent-card{background:var(--white);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);}
-.parent-card-label{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.parent-wrap{padding:0}
+.parent-nav{display:flex;gap:0;background:var(--parchment);border-bottom:2px solid var(--border);padding:0 28px;overflow-x:auto;}
+.parent-nav::-webkit-scrollbar{height:0}
+.parent-tab{padding:14px 20px;border:none;border-bottom:3px solid transparent;font-family:var(--font-ui);font-size:13px;font-weight:800;cursor:pointer;color:var(--muted);background:transparent;white-space:nowrap;transition:all 0.2s;margin-bottom:-2px;}
+.parent-tab:hover{color:var(--ink2)}
+.parent-tab.active{color:var(--ink);border-bottom-color:var(--gold);}
+.parent-body{padding:28px 32px}
+.parent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.parent-card{background:var(--white);border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);}
+.parent-card-label{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .parent-card-value{font-family:var(--font-title);font-size:28px;color:var(--ink);font-weight:700}
-.parent-card-sub{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+.parent-card-sub{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+
+/* Child selector cards */
+.child-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:28px}
+.child-card{background:var(--white);border-radius:16px;border:2px solid var(--border);cursor:pointer;transition:all 0.22s;overflow:hidden;box-shadow:0 2px 12px var(--shadow);}
+.child-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(44,24,16,0.18);border-color:var(--gold)}
+.child-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,148,42,0.2)}
+.child-card-header{padding:20px;background:linear-gradient(135deg,#2c1810,#1a2a2a);display:flex;align-items:center;gap:14px;}
+.child-card-avatar{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.child-card-name{font-family:var(--font-title);font-size:17px;color:var(--gold2);font-weight:700}
+.child-card-user{font-family:var(--font-ui);font-size:11px;color:rgba(232,184,75,0.6);font-weight:600;margin-top:2px}
+.child-card-body{padding:16px 20px}
+.child-card-stat{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--parchment2);}
+.child-card-stat:last-child{border-bottom:none}
+.child-card-stat-label{font-family:var(--font-ui);font-size:12px;color:var(--muted);font-weight:700}
+.child-card-stat-val{font-family:var(--font-ui);font-size:13px;color:var(--ink);font-weight:800}
+.child-progress-bar{height:6px;background:var(--parchment2);border-radius:3px;margin-top:12px;overflow:hidden;}
+.child-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.6s ease}
+.child-progress-label{font-family:var(--font-ui);font-size:10px;font-weight:800;color:var(--muted);margin-top:5px;text-align:right}
+
+/* Detail panel */
+.detail-panel{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:0 4px 20px var(--shadow);overflow:hidden;margin-bottom:24px;}
+.detail-header{padding:20px 24px;background:linear-gradient(135deg,#2c1810,#1a2a2a);display:flex;align-items:center;gap:14px;}
+.detail-back{color:rgba(232,184,75,0.7);font-family:var(--font-ui);font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color 0.2s;}
+.detail-back:hover{color:var(--gold2)}
+.detail-title{font-family:var(--font-title);font-size:20px;color:var(--gold2);font-weight:700}
+.detail-sub{font-family:var(--font-ui);font-size:11px;color:rgba(232,184,75,0.55);font-weight:600}
+.detail-body{padding:24px}
+.detail-section{margin-bottom:28px}
+.detail-section-title{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.detail-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Edit form inside parent hub */
+.edit-form{background:var(--parchment);border-radius:12px;border:1px solid var(--border);padding:20px;margin-bottom:0;}
+.edit-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;}
+.edit-row:last-child{margin-bottom:0}
+.edit-field{flex:1;min-width:140px;}
+.edit-label{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block}
+.edit-inp{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:9px;font-family:var(--font-ui);font-size:14px;font-weight:700;color:var(--ink);background:var(--white);outline:none;transition:border-color 0.2s;}
+.edit-inp:focus{border-color:var(--gold)}
+.edit-btn{padding:10px 18px;border-radius:9px;border:none;font-family:var(--font-ui);font-size:13px;font-weight:800;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+.edit-btn.primary{background:var(--ink);color:var(--gold2);}
+.edit-btn.primary:hover{background:#4a3728}
+.edit-btn.danger{background:#fdf2f2;color:var(--rose);border:2px solid #e8b4b4;}
+.edit-btn.danger:hover{background:var(--rose);color:white}
+.edit-btn:disabled{opacity:0.5;cursor:not-allowed}
+.edit-success{background:#f0fdf4;border:1px solid #86efac;color:#166534;border-radius:8px;padding:8px 12px;font-family:var(--font-ui);font-size:12px;font-weight:700;margin-top:8px;}
+.edit-error{background:#fdf2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:8px;padding:8px 12px;font-family:var(--font-ui);font-size:12px;font-weight:700;margin-top:8px;}
+
+/* Badge mini display in detail */
+.badge-mini-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.badge-mini{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-family:var(--font-ui);font-size:12px;font-weight:700;}
+.badge-mini.earned{background:#fef9e7;border:1.5px solid var(--gold);color:var(--ink2);}
+.badge-mini.locked{background:var(--parchment2);border:1.5px solid var(--border);color:var(--muted);opacity:0.6;}
+
+/* Books read chips */
+.book-chip{padding:5px 12px;background:var(--parchment2);border-radius:20px;font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--ink2);border:1px solid var(--border);}
 
 /* ===== VOICE PLAYER ===== */
 @keyframes voicePulse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.6)}}
@@ -2755,41 +2817,428 @@ function BadgesScreen({ profile }) {
 }
 
 // ─── ParentHub ────────────────────────────────────────────────────────────────
-function ParentHub({ allProfiles }) {
+function ParentHub({ allProfiles, onRefresh }) {
+  const [tab, setTab]             = useState('children');   // 'children' | 'manage'
+  const [selected, setSelected]   = useState(null);         // username of selected child
+  const [editName, setEditName]   = useState('');
+  const [editMsg, setEditMsg]     = useState(null);          // {type:'ok'|'err', text}
+  const [newPass, setNewPass]     = useState('');
+  const [newPass2, setNewPass2]   = useState('');
+  const [passMsg, setPassMsg]     = useState(null);
+  const [saving, setSaving]       = useState(false);
+
+  // makeHash must be available here (duplicate definition is safe — same pure fn)
+  function hashPw(pw) {
+    try { return btoa(encodeURIComponent(pw)); } catch { return btoa(pw); }
+  }
+
+  // Get fresh child data for selected child
+  const childData = selected
+    ? allProfiles.find(p => p.username === selected)
+    : null;
+  const childProfile = childData ? childData.profile : {};
+
+  // ── Stats ──────────────────────────────────────────────────────────────────
+  const totalBooks    = BOOKS.length;
+  const totalChapters = BOOKS.reduce((a,b) => a + b.chapters.length, 0);
+  const booksRead     = (childProfile.booksRead     || []).length;
+  const booksComplete = (childProfile.booksCompleted|| []).length;
+  const quizzesDone   = childProfile.quizzesCompleted || 0;
+  const perfects      = childProfile.perfectQuizzes   || 0;
+  const badgesEarned  = (childProfile.badges          || []).length;
+  const chapsDone     = Object.values(childProfile.chaptersCompleted || {})
+    .reduce((a,arr) => a + arr.filter(c=>c!=='final').length, 0);
+  const libPct        = totalChapters > 0 ? Math.round((chapsDone / totalChapters) * 100) : 0;
+
+  // ── Save name ──────────────────────────────────────────────────────────────
+  async function saveName() {
+    const trimmed = editName.trim();
+    if (!trimmed) { setEditMsg({type:'err', text:'Name cannot be empty.'}); return; }
+    setSaving(true); setEditMsg(null);
+    await new Promise(r => setTimeout(r,200));
+    // Update auth record
+    const authKey = 'qisas_auth_' + selected;
+    try {
+      const rec = JSON.parse(localStorage.getItem(authKey) || '{}');
+      rec.name = trimmed;
+      localStorage.setItem(authKey, JSON.stringify(rec));
+    } catch {}
+    // Update profile
+    const p = getProfile(selected);
+    p.name = trimmed;
+    saveProfile(selected, p);
+    setEditMsg({type:'ok', text:`Name updated to "${trimmed}" ✅`});
+    setSaving(false);
+    if (onRefresh) onRefresh();
+  }
+
+  // ── Reset password ─────────────────────────────────────────────────────────
+  async function resetPassword() {
+    if (!newPass.trim()) { setPassMsg({type:'err', text:'Enter a new password.'}); return; }
+    if (newPass !== newPass2) { setPassMsg({type:'err', text:'Passwords do not match.'}); return; }
+    if (newPass.length < 4) { setPassMsg({type:'err', text:'Password must be at least 4 characters.'}); return; }
+    setSaving(true); setPassMsg(null);
+    await new Promise(r => setTimeout(r,200));
+    const authKey = 'qisas_auth_' + selected;
+    try {
+      const rec = JSON.parse(localStorage.getItem(authKey) || '{}');
+      rec.hash = hashPw(newPass.trim());
+      localStorage.setItem(authKey, JSON.stringify(rec));
+      setPassMsg({type:'ok', text:'Password updated successfully ✅'});
+      setNewPass(''); setNewPass2('');
+    } catch {
+      setPassMsg({type:'err', text:'Could not update password. Try again.'});
+    }
+    setSaving(false);
+  }
+
+  // ── Select child and pre-fill name ────────────────────────────────────────
+  function selectChild(uname) {
+    setSelected(uname);
+    setEditMsg(null); setPassMsg(null); setNewPass(''); setNewPass2('');
+    const p = allProfiles.find(x => x.username === uname);
+    setEditName(p ? (p.profile.name || uname) : uname);
+    setTab('children');
+  }
+
+  // ── Overview numbers (all children combined) ───────────────────────────────
+  const totalBooksReadAll    = allProfiles.reduce((a,p)=>a+(p.profile.booksRead||[]).length,0);
+  const totalQuizzesAll      = allProfiles.reduce((a,p)=>a+(p.profile.quizzesCompleted||0),0);
+  const totalBadgesAll       = allProfiles.reduce((a,p)=>a+(p.profile.badges||[]).length,0);
+
   return (
     <div className="parent-wrap">
-      <div className="books-grid-title" style={{marginBottom:20}}>Parent Overview</div>
-      {allProfiles.length === 0 && (
-        <div style={{fontFamily:'var(--font-ui)',fontSize:14,color:'var(--muted)',fontStyle:'italic'}}>No child accounts found yet. Register a child account to see progress here.</div>
-      )}
-      {allProfiles.map(({ username, profile }) => (
-        <div key={username} style={{marginBottom:32}}>
-          <div style={{fontFamily:'var(--font-title)',fontSize:18,color:'var(--ink2)',marginBottom:14,fontWeight:600}}>{profile.name || username}'s Progress</div>
-          <div className="parent-grid">
-            <div className="parent-card"><div className="parent-card-label">Books Read</div><div className="parent-card-value">{(profile.booksRead||[]).length}</div><div className="parent-card-sub">of {BOOKS.length} total</div></div>
-            <div className="parent-card"><div className="parent-card-label">Books Completed</div><div className="parent-card-value">{(profile.booksCompleted||[]).length}</div></div>
-            <div className="parent-card"><div className="parent-card-label">Quizzes Taken</div><div className="parent-card-value">{profile.quizzesCompleted || 0}</div></div>
-            <div className="parent-card"><div className="parent-card-label">Perfect Scores</div><div className="parent-card-value">{profile.perfectQuizzes || 0}</div></div>
-            <div className="parent-card"><div className="parent-card-label">Badges Earned</div><div className="parent-card-value">{(profile.badges||[]).length}</div><div className="parent-card-sub">of {BADGES.length} available</div></div>
-          </div>
-          {profile.booksRead && profile.booksRead.length > 0 && (
-            <div>
-              <div style={{fontFamily:'var(--font-ui)',fontSize:11,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:10}}>Books Read</div>
-              <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
-                {profile.booksRead.map(id => {
-                  const bk = BOOKS.find(b=>b.id===id);
-                  return bk ? (
-                    <div key={id} style={{padding:'6px 12px',background:'var(--parchment2)',borderRadius:8,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)',border:'1px solid var(--border)'}}>
-                      {bk.title}
-                    </div>
-                  ) : null;
-                })}
+      {/* Top nav tabs */}
+      <div className="parent-nav">
+        <button className={`parent-tab${tab==='children'?' active':''}`} onClick={()=>setTab('children')}>
+          👦 Children
+        </button>
+        <button className={`parent-tab${tab==='manage'?' active':''}`} onClick={()=>{setTab('manage');}}>
+          ⚙️ Manage Accounts
+        </button>
+      </div>
+
+      <div className="parent-body">
+
+        {/* ══════ TAB: CHILDREN ══════ */}
+        {tab === 'children' && (
+          <div>
+            {/* Summary strip */}
+            {allProfiles.length > 0 && !selected && (
+              <div className="parent-grid" style={{marginBottom:28}}>
+                <div className="parent-card">
+                  <div className="parent-card-label">Children</div>
+                  <div className="parent-card-value">{allProfiles.length}</div>
+                  <div className="parent-card-sub">registered accounts</div>
+                </div>
+                <div className="parent-card">
+                  <div className="parent-card-label">Books Read</div>
+                  <div className="parent-card-value">{totalBooksReadAll}</div>
+                  <div className="parent-card-sub">across all children</div>
+                </div>
+                <div className="parent-card">
+                  <div className="parent-card-label">Quizzes Done</div>
+                  <div className="parent-card-value">{totalQuizzesAll}</div>
+                </div>
+                <div className="parent-card">
+                  <div className="parent-card-label">Badges Earned</div>
+                  <div className="parent-card-value">{totalBadgesAll}</div>
+                  <div className="parent-card-sub">of {BADGES.length * allProfiles.length} possible</div>
+                </div>
               </div>
-            </div>
-          )}
-          <div style={{height:1,background:'var(--border)',margin:'24px 0'}}/>
-        </div>
-      ))}
+            )}
+
+            {/* No children yet */}
+            {allProfiles.length === 0 && (
+              <div style={{textAlign:'center',padding:'48px 20px',color:'var(--muted)',fontFamily:'var(--font-ui)'}}>
+                <div style={{fontSize:48,marginBottom:16}}>👦</div>
+                <div style={{fontWeight:800,fontSize:16,marginBottom:8,color:'var(--ink2)'}}>No child accounts yet</div>
+                <div style={{fontSize:13,fontWeight:600}}>Ask your child to register an account with type "Child" to see their progress here.</div>
+              </div>
+            )}
+
+            {/* Child cards grid — no child selected */}
+            {!selected && allProfiles.length > 0 && (
+              <div>
+                <div className="detail-section-title" style={{marginBottom:18}}>Select a child to see their full progress</div>
+                <div className="child-cards">
+                  {allProfiles.map(({ username: uname, profile: prof }) => {
+                    const br = (prof.booksRead||[]).length;
+                    const bc = (prof.booksCompleted||[]).length;
+                    const qz = prof.quizzesCompleted || 0;
+                    const bg = (prof.badges||[]).length;
+                    const pct = totalChapters > 0
+                      ? Math.round(Object.values(prof.chaptersCompleted||{}).reduce((a,arr)=>a+arr.filter(c=>c!=='final').length,0) / totalChapters * 100)
+                      : 0;
+                    return (
+                      <div key={uname} className="child-card" onClick={() => selectChild(uname)}>
+                        <div className="child-card-header">
+                          <div className="child-card-avatar">👦</div>
+                          <div>
+                            <div className="child-card-name">{prof.name || uname}</div>
+                            <div className="child-card-user">@{uname}</div>
+                          </div>
+                        </div>
+                        <div className="child-card-body">
+                          <div className="child-card-stat">
+                            <span className="child-card-stat-label">📚 Books Read</span>
+                            <span className="child-card-stat-val">{br} / {totalBooks}</span>
+                          </div>
+                          <div className="child-card-stat">
+                            <span className="child-card-stat-label">✅ Completed</span>
+                            <span className="child-card-stat-val">{bc}</span>
+                          </div>
+                          <div className="child-card-stat">
+                            <span className="child-card-stat-label">📝 Quizzes</span>
+                            <span className="child-card-stat-val">{qz}</span>
+                          </div>
+                          <div className="child-card-stat">
+                            <span className="child-card-stat-label">🏅 Badges</span>
+                            <span className="child-card-stat-val">{bg} / {BADGES.length}</span>
+                          </div>
+                          <div className="child-progress-bar">
+                            <div className="child-progress-fill" style={{width: pct+'%'}}/>
+                          </div>
+                          <div className="child-progress-label">{pct}% of library read</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Detail view — child selected */}
+            {selected && childData && (
+              <div>
+                <div className="detail-panel">
+                  <div className="detail-header">
+                    <div>
+                      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
+                        <span className="detail-back" onClick={() => setSelected(null)}>← All Children</span>
+                      </div>
+                      <div className="detail-title">{childProfile.name || selected}'s Progress</div>
+                      <div className="detail-sub">@{selected}</div>
+                    </div>
+                  </div>
+
+                  <div className="detail-body">
+                    {/* Stats grid */}
+                    <div className="detail-section">
+                      <div className="detail-section-title">Overview</div>
+                      <div className="parent-grid">
+                        <div className="parent-card">
+                          <div className="parent-card-label">Books Read</div>
+                          <div className="parent-card-value">{booksRead}</div>
+                          <div className="parent-card-sub">of {totalBooks}</div>
+                        </div>
+                        <div className="parent-card">
+                          <div className="parent-card-label">Completed</div>
+                          <div className="parent-card-value">{booksComplete}</div>
+                          <div className="parent-card-sub">all chapters done</div>
+                        </div>
+                        <div className="parent-card">
+                          <div className="parent-card-label">Chapters Read</div>
+                          <div className="parent-card-value">{chapsDone}</div>
+                          <div className="parent-card-sub">of {totalChapters}</div>
+                        </div>
+                        <div className="parent-card">
+                          <div className="parent-card-label">Quizzes</div>
+                          <div className="parent-card-value">{quizzesDone}</div>
+                        </div>
+                        <div className="parent-card">
+                          <div className="parent-card-label">Perfect Scores</div>
+                          <div className="parent-card-value">{perfects}</div>
+                        </div>
+                        <div className="parent-card">
+                          <div className="parent-card-label">Badges</div>
+                          <div className="parent-card-value">{badgesEarned}</div>
+                          <div className="parent-card-sub">of {BADGES.length}</div>
+                        </div>
+                      </div>
+                      {/* Library progress bar */}
+                      <div style={{background:'var(--parchment)',borderRadius:12,padding:'14px 18px',border:'1px solid var(--border)'}}>
+                        <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                          <span style={{fontFamily:'var(--font-ui)',fontSize:12,fontWeight:800,color:'var(--ink2)'}}>Library Progress</span>
+                          <span style={{fontFamily:'var(--font-ui)',fontSize:12,fontWeight:800,color:'var(--gold)'}}>{libPct}%</span>
+                        </div>
+                        <div className="child-progress-bar" style={{height:10}}>
+                          <div className="child-progress-fill" style={{width:libPct+'%'}}/>
+                        </div>
+                        <div style={{fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',fontWeight:600,marginTop:6}}>{chapsDone} of {totalChapters} chapters read across all books</div>
+                      </div>
+                    </div>
+
+                    {/* Books read */}
+                    {(childProfile.booksRead||[]).length > 0 && (
+                      <div className="detail-section">
+                        <div className="detail-section-title">Books Read</div>
+                        <div className="badge-mini-grid">
+                          {(childProfile.booksRead||[]).map(id => {
+                            const bk = BOOKS.find(b=>b.id===id);
+                            const done = (childProfile.booksCompleted||[]).includes(id);
+                            return bk ? (
+                              <div key={id} className="book-chip" style={{borderColor: done ? 'var(--gold)' : 'var(--border)', background: done ? '#fef9e7' : 'var(--parchment2)'}}>
+                                {done ? '✅ ' : '📖 '}{bk.title}
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Badges */}
+                    <div className="detail-section">
+                      <div className="detail-section-title">Badges</div>
+                      <div className="badge-mini-grid">
+                        {BADGES.map(b => {
+                          const earned = (childProfile.badges||[]).includes(b.id);
+                          return (
+                            <div key={b.id} className={`badge-mini ${earned?'earned':'locked'}`}>
+                              <span>{earned ? b.icon : '🔒'}</span>
+                              <span>{b.name}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Per-book chapter breakdown */}
+                    {(childProfile.chaptersCompleted && Object.keys(childProfile.chaptersCompleted).length > 0) && (
+                      <div className="detail-section">
+                        <div className="detail-section-title">Chapter Progress by Book</div>
+                        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                          {BOOKS.filter(b=>(childProfile.chaptersCompleted||{})[b.id]).map(bk => {
+                            const done = ((childProfile.chaptersCompleted||{})[bk.id]||[]).filter(c=>c!=='final').length;
+                            const pct = Math.round(done / bk.chapters.length * 100);
+                            return (
+                              <div key={bk.id} style={{background:'var(--parchment)',borderRadius:10,padding:'12px 16px',border:'1px solid var(--border)'}}>
+                                <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                                  <span style={{fontFamily:'var(--font-body)',fontSize:13,fontWeight:700,color:'var(--ink)'}}>{bk.title}</span>
+                                  <span style={{fontFamily:'var(--font-ui)',fontSize:12,fontWeight:800,color:pct===100?'var(--gold)':'var(--muted)'}}>{done}/{bk.chapters.length} {pct===100?'✅':''}</span>
+                                </div>
+                                <div className="child-progress-bar" style={{height:6}}>
+                                  <div className="child-progress-fill" style={{width:pct+'%'}}/>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════ TAB: MANAGE ══════ */}
+        {tab === 'manage' && (
+          <div>
+            {allProfiles.length === 0 && (
+              <div style={{textAlign:'center',padding:'48px 20px',color:'var(--muted)',fontFamily:'var(--font-ui)'}}>
+                <div style={{fontSize:48,marginBottom:16}}>⚙️</div>
+                <div style={{fontWeight:800,fontSize:16,color:'var(--ink2)'}}>No child accounts registered yet.</div>
+              </div>
+            )}
+
+            {allProfiles.map(({ username: uname, profile: prof }) => {
+              const isOpen = selected === uname;
+              return (
+                <div key={uname} className="detail-panel" style={{marginBottom:20}}>
+                  {/* Card header — always visible, click to expand */}
+                  <div className="detail-header" style={{cursor:'pointer'}} onClick={() => {
+                    if (isOpen) { setSelected(null); setEditMsg(null); setPassMsg(null); }
+                    else { selectChild(uname); setTab('manage'); }
+                  }}>
+                    <div className="child-card-avatar" style={{width:42,height:42,fontSize:20}}>👦</div>
+                    <div style={{flex:1}}>
+                      <div className="detail-title" style={{fontSize:17}}>{prof.name || uname}</div>
+                      <div className="detail-sub">@{uname}</div>
+                    </div>
+                    <div style={{color:'rgba(232,184,75,0.6)',fontFamily:'var(--font-ui)',fontSize:13,fontWeight:800}}>
+                      {isOpen ? '▲ Close' : '▼ Edit'}
+                    </div>
+                  </div>
+
+                  {/* Expanded manage panel */}
+                  {isOpen && (
+                    <div className="detail-body">
+
+                      {/* ── Change Name ── */}
+                      <div className="detail-section">
+                        <div className="detail-section-title">✏️ Change Display Name</div>
+                        <div className="edit-form">
+                          <div className="edit-row">
+                            <div className="edit-field">
+                              <label className="edit-label">New Name</label>
+                              <input className="edit-inp" placeholder="e.g. Ibraheem" value={editName}
+                                onChange={e=>{setEditName(e.target.value);setEditMsg(null);}}/>
+                            </div>
+                            <button className="edit-btn primary" onClick={saveName} disabled={saving}>
+                              {saving ? 'Saving…' : 'Save Name'}
+                            </button>
+                          </div>
+                          {editMsg && <div className={editMsg.type==='ok'?'edit-success':'edit-error'}>{editMsg.text}</div>}
+                        </div>
+                      </div>
+
+                      {/* ── Reset Password ── */}
+                      <div className="detail-section">
+                        <div className="detail-section-title">🔑 Reset Password</div>
+                        <div className="edit-form">
+                          <div className="edit-row">
+                            <div className="edit-field">
+                              <label className="edit-label">New Password</label>
+                              <input className="edit-inp" type="password" placeholder="Min. 4 characters" value={newPass}
+                                onChange={e=>{setNewPass(e.target.value);setPassMsg(null);}}/>
+                            </div>
+                            <div className="edit-field">
+                              <label className="edit-label">Confirm Password</label>
+                              <input className="edit-inp" type="password" placeholder="Repeat password" value={newPass2}
+                                onChange={e=>{setNewPass2(e.target.value);setPassMsg(null);}}
+                                onKeyDown={e=>e.key==='Enter'&&resetPassword()}/>
+                            </div>
+                            <button className="edit-btn primary" onClick={resetPassword} disabled={saving}>
+                              {saving ? 'Saving…' : 'Set Password'}
+                            </button>
+                          </div>
+                          {passMsg && <div className={passMsg.type==='ok'?'edit-success':'edit-error'}>{passMsg.text}</div>}
+                          <div style={{fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',marginTop:8,fontWeight:600}}>
+                            💡 Use this if your child forgets their password. Their reading progress will not be affected.
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Quick stats in manage view ── */}
+                      <div className="detail-section" style={{marginBottom:0}}>
+                        <div className="detail-section-title">📊 Quick Stats</div>
+                        <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                          {[
+                            ['📚','Books Read', (prof.booksRead||[]).length + ' / ' + totalBooks],
+                            ['✅','Completed',  (prof.booksCompleted||[]).length],
+                            ['📝','Quizzes',    prof.quizzesCompleted||0],
+                            ['🏅','Badges',     (prof.badges||[]).length + ' / ' + BADGES.length],
+                            ['⭐','Perfects',   prof.perfectQuizzes||0],
+                          ].map(([icon,label,val])=>(
+                            <div key={label} style={{background:'var(--parchment)',border:'1px solid var(--border)',borderRadius:10,padding:'10px 14px',minWidth:90,textAlign:'center'}}>
+                              <div style={{fontSize:20,marginBottom:4}}>{icon}</div>
+                              <div style={{fontFamily:'var(--font-ui)',fontSize:11,fontWeight:800,color:'var(--muted)',marginBottom:3}}>{label}</div>
+                              <div style={{fontFamily:'var(--font-title)',fontSize:16,fontWeight:700,color:'var(--ink)'}}>{val}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -2818,10 +3267,11 @@ function App() {
   });
 
   const voice = useVoice();
-  const [screen, setScreen] = useState('library');
+  const [screen, setScreen]       = useState('library');
   const [activeBook, setActiveBook] = useState(null);
-  const [activeCat, setActiveCat] = useState('all');   // FIX: lifted to App so sidebar can control it
-  const [toast, setToast] = useState(null);
+  const [activeCat, setActiveCat] = useState('all');
+  const [toast, setToast]         = useState(null);
+  const [refreshTick, setRefreshTick] = useState(0); // bump to re-read child profiles
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   // Consistent hash: same function used for both register and login
@@ -2918,7 +3368,9 @@ function App() {
     setActiveBook(null);
   }
 
-  const allChildProfiles = isParent ? (() => {
+  // Re-reads every time refreshTick changes (after parent edits a child)
+  const allChildProfiles = useCallback(() => {
+    if (!isParent) return [];
     const results = [];
     for (let i=0; i<localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -2933,7 +3385,8 @@ function App() {
       }
     }
     return results;
-  })() : [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isParent, refreshTick])();
 
   // ── Auth screen ────────────────────────────────────────────────────────────
   if (!username) {
@@ -3152,7 +3605,7 @@ function App() {
               voice={voice}/>
           )}
           {screen === 'badges' && <BadgesScreen profile={profile}/>}
-          {screen === 'parent' && <ParentHub allProfiles={allChildProfiles}/>}
+          {screen === 'parent' && <ParentHub allProfiles={allChildProfiles} onRefresh={()=>setRefreshTick(t=>t+1)}/>}
         </div>
       </div>
 
