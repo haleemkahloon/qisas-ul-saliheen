@@ -217,6 +217,40 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 .story-body p:last-child{margin-bottom:0}
 .story-pull-quote{border-left:4px solid var(--gold);padding:14px 20px;margin:20px 0;background:linear-gradient(90deg,#fef9e7,transparent);border-radius:0 8px 8px 0;font-style:italic;font-size:17px;color:var(--ink);font-weight:600;}
 .story-highlight{display:inline;background:linear-gradient(120deg,rgba(201,148,42,0.2) 0%,rgba(201,148,42,0.15) 100%);border-radius:3px;padding:1px 3px;}
+
+/* ===== INLINE STORY ILLUSTRATIONS ===== */
+.story-illo{
+  margin:28px -28px;
+  position:relative;
+  overflow:hidden;
+  background:var(--parchment2);
+  border-top:2px solid var(--border);
+  border-bottom:2px solid var(--border);
+}
+.story-illo svg{display:block;width:100%;height:auto;}
+.story-illo-caption{
+  text-align:center;
+  font-family:var(--font-ui);font-size:11px;font-weight:700;
+  color:var(--muted);font-style:italic;
+  padding:8px 20px 10px;
+  background:var(--parchment2);
+  border-top:1px solid var(--border);
+  letter-spacing:0.3px;
+}
+.story-page-break{
+  display:flex;align-items:center;gap:14px;
+  margin:32px 0;
+}
+.story-page-break::before,.story-page-break::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+}
+.story-page-break-icon{
+  font-family:var(--font-ui);font-size:11px;font-weight:800;
+  color:var(--gold);letter-spacing:2px;text-transform:uppercase;
+  padding:4px 12px;border:1px solid var(--border);border-radius:20px;
+  white-space:nowrap;
+}
 .lesson-box{margin:0 28px 28px;padding:24px;background:linear-gradient(135deg,#1a2a1a,#2c1810);border-radius:14px;position:relative;overflow:hidden;}
 .lesson-box::before{content:'✨';position:absolute;top:16px;right:16px;font-size:24px;opacity:0.3;}
 .lesson-box-title{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;}
@@ -966,8 +1000,833 @@ const CATEGORIES = [
 ];
 
 // ─── BOOKS DATA ───────────────────────────────────────────────────────────────
+// ─── Story Illustration Components ───────────────────────────────────────────
+// These are referenced via illoKey in chapter content objects.
+// All gradients have unique prefixed IDs. No Math.random(). Static positions only.
+
+function IlloNuhIdols() {
+  return (
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo1Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#100808"/><stop offset="100%" stopColor="#2a1208"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="300" fill="url(#gIllo1Sky)"/>
+      {/* Stars */}
+      {[[60,22],[145,14],[270,28],[390,10],[510,20],[630,16],[745,26],[95,38],[340,32],[580,36]].map(([x,y],i)=>(
+        <circle key={i} cx={x} cy={y} r={1.4} fill="white" opacity={0.6}/>
+      ))}
+      {/* Ground */}
+      <rect x="0" y="255" width="800" height="45" fill="#2a1505"/>
+      <path d="M 0 255 Q 200 242 400 252 Q 600 262 800 248 L 800 300 L 0 300 Z" fill="#1a0d03"/>
+      {/* Torchlight glow */}
+      <ellipse cx="400" cy="270" rx="380" ry="70" fill="rgba(180,90,20,0.14)"/>
+      {/* Torch left */}
+      <rect x="28" y="195" width="7" height="58" fill="#5a2808"/>
+      <ellipse cx="31" cy="192" rx="9" ry="13" fill="#e8901a" opacity="0.9"/>
+      <ellipse cx="31" cy="190" rx="6" ry="9" fill="#fff0a0" opacity="0.7"/>
+      {/* Torch center */}
+      <rect x="393" y="185" width="7" height="68" fill="#5a2808"/>
+      <ellipse cx="396" cy="182" rx="9" ry="13" fill="#e8901a" opacity="0.9"/>
+      <ellipse cx="396" cy="180" rx="6" ry="9" fill="#fff0a0" opacity="0.7"/>
+      {/* Torch right */}
+      <rect x="758" y="200" width="7" height="55" fill="#5a2808"/>
+      <ellipse cx="761" cy="197" rx="9" ry="12" fill="#e8901a" opacity="0.9"/>
+      <ellipse cx="761" cy="195" rx="6" ry="8" fill="#fff0a0" opacity="0.7"/>
+
+      {/* IDOL 1 — Eagle / Nasr (far left) */}
+      <rect x="55" y="130" width="28" height="125" fill="#5a3e18" rx="3"/>
+      <path d="M 55 130 Q 69 100 83 130" fill="#4a2e10"/>
+      <path d="M 44 148 Q 20 128 0 138 Q 22 144 44 158 Z" fill="#4a2e10"/>
+      <path d="M 83 148 Q 107 128 128 138 Q 106 144 83 158 Z" fill="#4a2e10"/>
+      <ellipse cx="69" cy="108" rx="15" ry="18" fill="#3a2010"/>
+      <path d="M 78 112 L 92 117 L 78 119 Z" fill="#2a1008"/>
+      <circle cx="64" cy="104" r="3" fill="#0a0404"/>
+
+      {/* IDOL 2 — Lion / Yaghuth (center-left) */}
+      <rect x="205" y="150" width="32" height="105" fill="#5a3e18" rx="3"/>
+      <path d="M 205 150 Q 221 118 237 150" fill="#4a2e10"/>
+      <ellipse cx="221" cy="137" rx="25" ry="17" fill="#7a5228"/>
+      <circle cx="244" cy="132" r="22" fill="#7a5228"/>
+      <circle cx="244" cy="132" r="28" fill="none" stroke="#5a3618" strokeWidth="7" opacity="0.75"/>
+      <ellipse cx="244" cy="134" rx="16" ry="15" fill="#8a6238"/>
+      <ellipse cx="238" cy="128" rx="3.5" ry="4" fill="#0a0404"/>
+      <ellipse cx="250" cy="128" rx="3.5" ry="4" fill="#0a0404"/>
+      <path d="M 237 140 Q 244 146 251 140" stroke="#3a1005" strokeWidth="2" fill="none"/>
+      <ellipse cx="244" cy="142" rx="5" ry="3.5" fill="#c06050"/>
+      {[[228,141],[222,139],[258,141],[264,139]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r={1.5} fill="#7a5020" opacity={0.7}/>)}
+
+      {/* IDOL 3 — Human / Wadd (center, tallest) */}
+      <rect x="354" y="65" width="42" height="190" fill="#6a4818" rx="4"/>
+      <path d="M 354 65 Q 375 34 396 65" fill="#5a3815"/>
+      <rect x="357" y="108" width="36" height="105" fill="#5a3815" rx="3"/>
+      <rect x="303" y="118" width="51" height="11" fill="#5a3815" rx="4"/>
+      <rect x="396" y="118" width="51" height="11" fill="#5a3815" rx="4"/>
+      <ellipse cx="375" cy="87" rx="23" ry="28" fill="#5a3815"/>
+      <path d="M 352 72 Q 375 50 398 72" fill="#c9942a"/>
+      <rect x="369" y="48" width="13" height="22" fill="#c9942a" rx="2"/>
+      <circle cx="375" cy="44" r="7" fill="#e8b030"/>
+      <ellipse cx="368" cy="85" rx="4" ry="5" fill="#0a0404"/>
+      <ellipse cx="382" cy="85" rx="4" ry="5" fill="#0a0404"/>
+      <path d="M 366 98 Q 375 104 384 98" stroke="#2a0a05" strokeWidth="2" fill="none"/>
+
+      {/* IDOL 4 — Bull / Suwa (center-right) */}
+      <rect x="518" y="160" width="30" height="95" fill="#4a3815" rx="3"/>
+      <path d="M 518 160 Q 533 130 548 160" fill="#3a2810"/>
+      <ellipse cx="533" cy="143" rx="29" ry="17" fill="#6a4820"/>
+      <ellipse cx="558" cy="138" rx="19" ry="15" fill="#6a4820"/>
+      <path d="M 548 127 Q 537 106 529 113" stroke="#4a2e10" strokeWidth="5" fill="none" strokeLinecap="round"/>
+      <path d="M 566 127 Q 577 106 585 113" stroke="#4a2e10" strokeWidth="5" fill="none" strokeLinecap="round"/>
+      <circle cx="562" cy="136" r="3.5" fill="#0a0404"/>
+      <path d="M 553 146 Q 560 151 568 146" stroke="#3a1805" strokeWidth="1.5" fill="none"/>
+
+      {/* IDOL 5 — Horse / Ya'uq (far right) */}
+      <rect x="668" y="145" width="26" height="110" fill="#5a3e18" rx="3"/>
+      <path d="M 668 145 Q 681 115 694 145" fill="#4a2e10"/>
+      <ellipse cx="681" cy="128" rx="23" ry="14" fill="#7a4e28"/>
+      <path d="M 693 120 Q 710 90 705 118 Q 700 132 693 132 Z" fill="#7a4e28"/>
+      <ellipse cx="710" cy="100" rx="14" ry="21" fill="#7a4e28"/>
+      <path d="M 698 84 Q 706 68 713 84 Q 706 79 698 84" fill="#5a3618"/>
+      <circle cx="716" cy="96" r="3" fill="#0a0404"/>
+
+      {/* Worshippers */}
+      {/* Prostrating */}
+      <circle cx="150" cy="240" r="9" fill="#2a1205"/>
+      <path d="M 150 249 Q 133 254 122 260 Q 138 260 158 258 Q 160 253 150 249 Z" fill="#2a1205"/>
+      <ellipse cx="124" cy="260" rx="10" ry="5" fill="#2a1205"/>
+      {/* Standing arms raised */}
+      <circle cx="302" cy="228" r="10" fill="#2a1205"/>
+      <rect x="296" y="238" width="13" height="32" fill="#2a1205" rx="4"/>
+      <line x1="296" y1="246" x2="279" y2="230" stroke="#2a1205" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="309" y1="246" x2="326" y2="230" stroke="#2a1205" strokeWidth="6" strokeLinecap="round"/>
+      {/* Kneeling */}
+      <circle cx="460" cy="238" r="9" fill="#2a1205"/>
+      <path d="M 460 247 L 449 270 L 471 270 L 460 247 Z" fill="#2a1205"/>
+      {/* Bowing */}
+      <circle cx="608" cy="254" r="8" fill="#2a1205"/>
+      <path d="M 608 262 Q 588 262 578 266 Q 594 270 608 268 Q 622 268 634 266 Q 628 262 608 262 Z" fill="#2a1205"/>
+    </svg>
+  );
+}
+
+function IlloNuhPreaches() {
+  return (
+    <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo2Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e8c455"/><stop offset="100%" stopColor="#c89830"/>
+        </linearGradient>
+        <linearGradient id="gIllo2Gnd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#a07040"/><stop offset="100%" stopColor="#785020"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="280" fill="url(#gIllo2Sky)"/>
+      {/* Sun */}
+      <circle cx="660" cy="52" r="38" fill="#fff0a0" opacity="0.9"/>
+      <circle cx="660" cy="52" r="26" fill="#ffe060"/>
+      {/* Ground / sand */}
+      <ellipse cx="400" cy="280" rx="480" ry="65" fill="url(#gIllo2Gnd)"/>
+      <ellipse cx="90" cy="268" rx="150" ry="40" fill="#906030"/>
+      <ellipse cx="710" cy="265" rx="130" ry="38" fill="#906030"/>
+      <rect x="0" y="248" width="800" height="32" fill="#604018"/>
+      {/* Rock elevation for Nuh */}
+      <ellipse cx="175" cy="258" rx="58" ry="20" fill="#8a6030"/>
+      <path d="M 120 258 Q 138 232 175 228 Q 212 232 230 258 Z" fill="#9a7040"/>
+
+      {/* HAZRAT NUH — standing on rock, arm raised */}
+      {/* Robe */}
+      <path d="M 150 172 Q 142 205 138 248 Q 157 252 175 252 Q 193 252 212 248 Q 208 205 200 172 Z" fill="#f0ead8"/>
+      <path d="M 162 172 Q 159 205 155 244" stroke="#ccc0a0" strokeWidth="2" fill="none"/>
+      <path d="M 188 172 Q 191 205 195 244" stroke="#ccc0a0" strokeWidth="2" fill="none"/>
+      <rect x="150" y="198" width="50" height="8" fill="#886018" rx="3"/>
+      {/* Arm raised preaching */}
+      <path d="M 200 185 Q 226 160 238 142" stroke="#c8905a" strokeWidth="13" strokeLinecap="round" fill="none"/>
+      <circle cx="240" cy="139" r="10" fill="#c8905a"/>
+      <line x1="240" y1="129" x2="240" y2="120" stroke="#c8905a" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="247" y1="130" x2="251" y2="121" stroke="#c8905a" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="233" y1="130" x2="229" y2="121" stroke="#c8905a" strokeWidth="4" strokeLinecap="round"/>
+      {/* Other arm out */}
+      <path d="M 150 185 Q 124 192 110 197" stroke="#c8905a" strokeWidth="12" strokeLinecap="round" fill="none"/>
+      {/* Head */}
+      <ellipse cx="175" cy="158" rx="23" ry="27" fill="#c8905a"/>
+      {/* Turban */}
+      <path d="M 152 148 Q 155 133 175 131 Q 195 133 198 148 Q 193 141 175 139 Q 157 141 152 148 Z" fill="#eee8c0"/>
+      <path d="M 198 144 Q 208 141 214 149 Q 207 152 200 149" fill="#eee8c0"/>
+      {/* Beard */}
+      <path d="M 157 168 Q 161 185 175 188 Q 189 185 193 168 Q 186 178 175 179 Q 164 178 157 168 Z" fill="#8a6820"/>
+      {/* Eyes — looking earnestly */}
+      <ellipse cx="169" cy="154" rx="3.5" ry="4" fill="#1a0808"/>
+      <ellipse cx="181" cy="154" rx="3.5" ry="4" fill="#1a0808"/>
+      <path d="M 168 163 Q 175 167 182 163" stroke="#5a3010" strokeWidth="1.5" fill="none"/>
+
+      {/* CHIEF 1 — arms crossed, head turned */}
+      <rect x="326" y="180" width="36" height="78" fill="#6a3515" rx="6"/>
+      <ellipse cx="344" cy="172" rx="21" ry="24" fill="#b87848"/>
+      <path d="M 323 162 Q 344 141 365 162 Q 357 155 344 153 Q 331 155 323 162 Z" fill="#c9942a"/>
+      <circle cx="344" cy="143" r="7" fill="#e8b030"/>
+      {/* Arms crossed */}
+      <path d="M 326 200 Q 358 195 373 203" stroke="#5a2508" strokeWidth="13" strokeLinecap="round" fill="none"/>
+      <path d="M 362 200 Q 334 205 319 197" stroke="#5a2508" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <ellipse cx="350" cy="158" rx="17" ry="16" fill="#b87848"/>
+      <circle cx="357" cy="154" r="3" fill="#1a0808"/>
+      <path d="M 345 165 Q 352 161 358 165" stroke="#4a2010" strokeWidth="1.5" fill="none"/>
+
+      {/* CHIEF 2 — mocking gesture */}
+      <rect x="428" y="188" width="32" height="70" fill="#4a2215" rx="6"/>
+      <ellipse cx="444" cy="181" rx="20" ry="23" fill="#b07548"/>
+      <path d="M 424 174 Q 444 155 464 174 Q 456 167 444 165 Q 432 167 424 174 Z" fill="#8b3a3a"/>
+      {/* Hand on hip */}
+      <path d="M 460 208 Q 478 202 485 212" stroke="#3a1505" strokeWidth="12" strokeLinecap="round" fill="none"/>
+      {/* Laughing mouth */}
+      <path d="M 436 189 Q 444 196 452 189" stroke="#2a0805" strokeWidth="2.2" fill="rgba(180,80,50,0.3)"/>
+      <circle cx="438" cy="185" r="2.8" fill="#1a0808"/>
+      <circle cx="450" cy="185" r="2.8" fill="#1a0808"/>
+
+      {/* CHIEF 3 — pointing dismissively */}
+      <rect x="530" y="192" width="30" height="66" fill="#3a2208" rx="6"/>
+      <ellipse cx="545" cy="185" rx="19" ry="22" fill="#a86e45"/>
+      <path d="M 526 178 Q 545 160 564 178 Q 556 172 545 170 Q 534 172 526 178 Z" fill="#1a4a7a"/>
+      <path d="M 530 206 Q 504 193 488 185" stroke="#2a1205" strokeWidth="12" strokeLinecap="round" fill="none"/>
+      <circle cx="486" cy="184" r="9" fill="#a86e45"/>
+      <line x1="486" y1="175" x2="477" y2="165" stroke="#a86e45" strokeWidth="6" strokeLinecap="round"/>
+      <circle cx="538" cy="181" r="2.8" fill="#1a0808"/>
+      <circle cx="552" cy="181" r="2.8" fill="#1a0808"/>
+      <path d="M 537 190 Q 545 186 553 190" stroke="#3a1505" strokeWidth="1.5" fill="none"/>
+
+      {/* HUMBLE BELIEVERS — left, attentive */}
+      <circle cx="48" cy="230" r="11" fill="#9a6540"/>
+      <path d="M 40 241 Q 36 260 38 272 Q 50 268 58 272 Q 60 260 56 241 Z" fill="#7a5030"/>
+      <path d="M 40 249 Q 30 246 22 248" stroke="#7a5030" strokeWidth="9" strokeLinecap="round" fill="none"/>
+      <circle cx="44" cy="226" r="2.5" fill="#1a0808"/>
+      <circle cx="52" cy="226" r="2.5" fill="#1a0808"/>
+      <path d="M 43 235 Q 48 239 53 235" stroke="#5a3020" strokeWidth="1.5" fill="none"/>
+      {/* Second believer, hand on heart */}
+      <circle cx="88" cy="218" r="10" fill="#906038"/>
+      <path d="M 80 228 Q 76 248 78 262 Q 88 258 98 262 Q 100 248 96 228 Z" fill="#6a4828"/>
+      <circle cx="84" cy="237" r="6" fill="#6a4828"/>
+      <circle cx="84" cy="214" r="2.5" fill="#1a0808"/>
+      <circle cx="92" cy="214" r="2.5" fill="#1a0808"/>
+      <path d="M 83 223 Q 88 227 93 223" stroke="#5a3020" strokeWidth="1.5" fill="none"/>
+
+      {/* Light ray from Nuh toward believers */}
+      <path d="M 218 162 Q 120 195 62 228" stroke="rgba(232,184,75,0.12)" strokeWidth="28" fill="none"/>
+    </svg>
+  );
+}
+
+function IlloNuhBuildsArk() {
+  return (
+    <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo3Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#88b0d0"/><stop offset="100%" stopColor="#c0d8e8"/>
+        </linearGradient>
+        <linearGradient id="gIllo3Gnd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#9a7045"/><stop offset="100%" stopColor="#704820"/>
+        </linearGradient>
+        <linearGradient id="gIllo3Wood" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8B5E2E"/><stop offset="100%" stopColor="#6B4018"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="320" fill="url(#gIllo3Sky)"/>
+      {/* Clouds */}
+      <ellipse cx="140" cy="55" rx="80" ry="28" fill="white" opacity="0.7"/>
+      <ellipse cx="100" cy="61" rx="52" ry="23" fill="white" opacity="0.6"/>
+      <ellipse cx="185" cy="60" rx="62" ry="24" fill="white" opacity="0.6"/>
+      <ellipse cx="580" cy="42" rx="88" ry="30" fill="white" opacity="0.7"/>
+      <ellipse cx="540" cy="48" rx="55" ry="23" fill="white" opacity="0.6"/>
+      <ellipse cx="640" cy="47" rx="64" ry="25" fill="white" opacity="0.6"/>
+      {/* Sun */}
+      <circle cx="720" cy="65" r="36" fill="#ffe870" opacity="0.9"/>
+      {/* Ground */}
+      <rect x="0" y="280" width="800" height="40" fill="url(#gIllo3Gnd)"/>
+      <path d="M 0 280 Q 200 268 400 278 Q 580 288 800 270 L 800 320 L 0 320 Z" fill="#584015"/>
+      {/* ARK HULL */}
+      <path d="M 72 285 Q 68 235 95 205 L 675 205 Q 702 235 695 285 Z" fill="url(#gIllo3Wood)"/>
+      <line x1="95" y1="218" x2="675" y2="218" stroke="#5a3008" strokeWidth="2.5" opacity="0.65"/>
+      <line x1="90" y1="235" x2="680" y2="235" stroke="#5a3008" strokeWidth="2.5" opacity="0.65"/>
+      <line x1="85" y1="255" x2="682" y2="255" stroke="#5a3008" strokeWidth="2.5" opacity="0.65"/>
+      <line x1="82" y1="272" x2="685" y2="272" stroke="#5a3008" strokeWidth="2.5" opacity="0.65"/>
+      {[175,275,375,475,575].map((x,i)=>(
+        <line key={i} x1={x} y1="205" x2={x-5} y2="285" stroke="#5a3008" strokeWidth="1.8" opacity="0.45"/>
+      ))}
+      {/* Upper deck */}
+      <rect x="105" y="166" width="570" height="41" fill="#7a4820" rx="2"/>
+      <line x1="105" y1="180" x2="675" y2="180" stroke="#5a2808" strokeWidth="2" opacity="0.55"/>
+      {/* Railing */}
+      <rect x="112" y="156" width="558" height="12" fill="#6a3810" rx="2"/>
+      {[130,160,190,220,250,280,310,340,370,400,430,460,490,520,550,580,610,640].map((x,i)=>(
+        <rect key={i} x={x} y="146" width="5" height="12" fill="#4a2808" rx="1"/>
+      ))}
+      <rect x="128" y="144" width="524" height="4" fill="#5a3010" rx="2"/>
+      {/* Cabin */}
+      <rect x="245" y="110" width="295" height="58" fill="#8B5E2E" rx="3"/>
+      <path d="M 243 110 Q 392 88 541 110" fill="#6a3e18"/>
+      <rect x="243" y="110" width="295" height="8" fill="#6a4018" rx="2"/>
+      {/* Cabin windows */}
+      {[265,310,365,418,470,512].map((x,i)=>(
+        <rect key={i} x={x} y="122" width="20" height="16" fill="#b8d8e8" rx="2" opacity="0.9"/>
+      ))}
+      {/* Mast */}
+      <rect x="386" y="48" width="9" height="118" fill="#5a3010" rx="2"/>
+      <path d="M 395 48 L 395 82 L 450 66 Z" fill="#d0c098" opacity="0.75"/>
+      {/* Workers */}
+      {/* Worker hammering */}
+      <circle cx="112" cy="224" r="11" fill="#b88858"/>
+      <ellipse cx="112" cy="246" rx="11" ry="20" fill="#7a4e28"/>
+      <path d="M 121 233 Q 138 215 147 207" stroke="#b88858" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <rect x="144" y="201" width="17" height="10" fill="#3a2010" rx="2"/>
+      <rect x="149" y="191" width="7" height="12" fill="#5a3810"/>
+      <circle cx="108" cy="220" r="2.5" fill="#1a0808"/>
+      <circle cx="116" cy="220" r="2.5" fill="#1a0808"/>
+      {/* Worker carrying plank */}
+      <circle cx="355" cy="192" r="11" fill="#a87848"/>
+      <ellipse cx="355" cy="214" rx="11" ry="20" fill="#6a4225"/>
+      <rect x="318" y="188" width="84" height="9" fill="#8B5E2E" rx="2"/>
+      <path d="M 346 204 Q 332 196 318 192" stroke="#a87848" strokeWidth="10" strokeLinecap="round" fill="none"/>
+      <path d="M 364 204 Q 378 196 400 190" stroke="#a87848" strokeWidth="10" strokeLinecap="round" fill="none"/>
+      {/* Nuh directing */}
+      <circle cx="440" cy="155" r="13" fill="#c09060"/>
+      <path d="M 429 168 Q 424 192 426 212 Q 440 207 454 212 Q 456 192 451 168 Z" fill="#f0e8d0"/>
+      <path d="M 452 175 Q 468 161 476 150" stroke="#c09060" strokeWidth="11" strokeLinecap="round" fill="none"/>
+      <circle cx="478" cy="148" r="9" fill="#c09060"/>
+      <path d="M 429 170 Q 415 165 406 162" stroke="#c09060" strokeWidth="10" strokeLinecap="round" fill="none"/>
+      <path d="M 428 148 Q 440 134 452 148 Q 446 142 440 140 Q 434 142 428 148 Z" fill="#eee8c0"/>
+      <path d="M 432 162 Q 436 174 440 176 Q 444 174 448 162 Q 444 168 440 170 Q 436 168 432 162 Z" fill="#9a7830"/>
+      <circle cx="436" cy="153" r="3" fill="#1a0808"/>
+      <circle cx="444" cy="153" r="3" fill="#1a0808"/>
+      <path d="M 435 161 Q 440 165 445 161" stroke="#6a3820" strokeWidth="1.5" fill="none"/>
+      {/* Mockers - far right */}
+      <circle cx="730" cy="264" r="9" fill="#b08048" opacity="0.9"/>
+      <rect x="724" y="273" width="14" height="28" fill="#886030" rx="4" opacity="0.9"/>
+      <path d="M 738 277 Q 750 272 757 268" stroke="#886030" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.9"/>
+      <circle cx="760" cy="262" r="9" fill="#a07040" opacity="0.9"/>
+      <rect x="754" y="271" width="14" height="28" fill="#785828" rx="4" opacity="0.9"/>
+      <path d="M 726 279 Q 713 274 706 270" stroke="#886030" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.9"/>
+      <ellipse cx="738" cy="250" rx="26" ry="13" fill="rgba(255,255,255,0.45)" opacity="0.7"/>
+      <text x="724" y="256" fontFamily="serif" fontSize="12" fill="#5a3020" opacity="0.75">Ha!</text>
+      {/* Scattered tools and lumber */}
+      <rect x="148" y="290" width="62" height="7" fill="#8B5E2E" rx="2" transform="rotate(-7,179,293)"/>
+      <rect x="230" y="298" width="46" height="6" fill="#7a4820" rx="2" transform="rotate(5,253,301)"/>
+      <circle cx="200" cy="295" r="5" fill="#5a3810"/>
+      <rect x="490" y="292" width="56" height="6" fill="#8B5E2E" rx="2" transform="rotate(-3,518,295)"/>
+    </svg>
+  );
+}
+
+function IlloNuhAnimals() {
+  return (
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo4Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#5878a0"/><stop offset="100%" stopColor="#98b8d0"/>
+        </linearGradient>
+        <linearGradient id="gIllo4Gnd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#887048"/><stop offset="100%" stopColor="#604828"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="300" fill="url(#gIllo4Sky)"/>
+      {/* Overcast clouds */}
+      <ellipse cx="200" cy="50" rx="120" ry="42" fill="#708090" opacity="0.7"/>
+      <ellipse cx="150" cy="58" rx="80" ry="34" fill="#607080" opacity="0.65"/>
+      <ellipse cx="270" cy="55" rx="95" ry="36" fill="#607080" opacity="0.65"/>
+      <ellipse cx="510" cy="38" rx="130" ry="45" fill="#708090" opacity="0.7"/>
+      <ellipse cx="460" cy="46" rx="85" ry="36" fill="#607080" opacity="0.65"/>
+      <ellipse cx="582" cy="43" rx="96" ry="38" fill="#607080" opacity="0.65"/>
+      {/* Rain drops */}
+      {[[282,92],[352,85],[424,90],[502,83],[564,90]].map(([x,y],i)=>(
+        <line key={i} x1={x} y1={y} x2={x-4} y2={y+18} stroke="rgba(180,210,240,0.55)" strokeWidth="1.8"/>
+      ))}
+      <rect x="0" y="258" width="800" height="42" fill="url(#gIllo4Gnd)"/>
+      <path d="M 0 258 Q 200 246 400 256 Q 580 266 800 250 L 800 300 L 0 300 Z" fill="#4a3818"/>
+
+      {/* ELEPHANTS — center */}
+      <ellipse cx="368" cy="236" rx="52" ry="32" fill="#808080"/>
+      <circle cx="414" cy="222" r="26" fill="#787878"/>
+      <path d="M 430 236 Q 450 248 445 266 Q 442 278 432 273 Q 434 263 434 250 Q 430 243 424 238" fill="#787878"/>
+      <circle cx="424" cy="216" r="4" fill="#1a0808"/>
+      <circle cx="425" cy="215" r="1.5" fill="white"/>
+      <ellipse cx="398" cy="216" rx="17" ry="23" fill="#6a6868"/>
+      <path d="M 432 236 Q 448 240 452 236 Q 448 230 432 230" fill="#f0ece0"/>
+      {[330,352,382,405].map((x,i)=><rect key={i} x={x} y="262" width="17" height="28" fill="#707070" rx="6"/>)}
+      <ellipse cx="308" cy="240" rx="46" ry="28" fill="#686868"/>
+      <circle cx="352" cy="230" r="23" fill="#606060"/>
+      <path d="M 368 241 Q 382 252 377 266" fill="#606060"/>
+      {[272,293,316,338].map((x,i)=><rect key={i} x={x} y="260" width="14" height="26" fill="#5a5a5a" rx="5"/>)}
+
+      {/* GIRAFFES — right */}
+      <rect x="588" y="158" width="20" height="105" fill="#c89830" rx="4"/>
+      <rect x="594" y="85" width="14" height="78" fill="#c89830" rx="5"/>
+      <ellipse cx="604" cy="77" rx="14" ry="19" fill="#b88820"/>
+      <rect x="597" y="60" width="5" height="15" fill="#8a6018" rx="2"/>
+      <rect x="605" y="60" width="5" height="15" fill="#8a6018" rx="2"/>
+      <circle cx="612" cy="73" r="3.5" fill="#1a0808"/>
+      <ellipse cx="616" cy="84" rx="3" ry="2" fill="#8a6018"/>
+      {[[597,208],[604,228]].map(([x,y],i)=><ellipse key={i} cx={x} cy={y} rx={i===0?8:6} ry={i===0?12:10} fill="#8a6018" opacity={0.6}/>)}
+      {[[584,270],[598,267],[613,270],[626,267]].map(([x,y],i)=><rect key={i} x={x} y={y} width="10" height={i%2===0?32:35} fill="#b88820" rx="4"/>)}
+      <rect x="558" y="172" width="18" height="90" fill="#b08020" rx="4" opacity="0.85"/>
+      <rect x="564" y="108" width="12" height="68" fill="#b08020" rx="4" opacity="0.85"/>
+      <ellipse cx="572" cy="100" rx="12" ry="15" fill="#a07018" opacity="0.85"/>
+
+      {/* LIONS — left */}
+      <ellipse cx="113" cy="244" rx="40" ry="22" fill="#c89838"/>
+      <circle cx="147" cy="234" r="23" fill="#a87018"/>
+      <circle cx="147" cy="234" r="30" fill="none" stroke="#7a5008" strokeWidth="8" opacity="0.7"/>
+      <ellipse cx="147" cy="236" rx="17" ry="16" fill="#c89838"/>
+      <circle cx="141" cy="230" r="4" fill="#1a0808"/>
+      <circle cx="153" cy="230" r="4" fill="#1a0808"/>
+      <circle cx="142" cy="229" r="1.5" fill="white"/>
+      <circle cx="154" cy="229" r="1.5" fill="white"/>
+      <path d="M 140 241 Q 147 246 154 241" stroke="#5a2008" strokeWidth="2" fill="rgba(200,100,80,0.3)"/>
+      <ellipse cx="147" cy="243" rx="6" ry="4" fill="#d08070"/>
+      <ellipse cx="147" cy="238" rx="4.5" ry="3.5" fill="#c06050"/>
+      {[[136,240],[130,238],[158,240],[164,238]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r={1.5} fill="#7a5018" opacity={0.7}/>)}
+      <path d="M 73 244 Q 62 230 65 220 Q 70 228 71 236 Q 78 240 73 244" fill="#c89838"/>
+      {[82,99,126,144].map((x,i)=><rect key={i} x={x} y="260" width="14" height="27" fill="#b08028" rx="6"/>)}
+      <ellipse cx="70" cy="248" rx="33" ry="19" fill="#b08828" opacity="0.9"/>
+      <circle cx="102" cy="241" r="18" fill="#a07818" opacity="0.9"/>
+
+      {/* DOVES — flying high */}
+      <ellipse cx="480" cy="108" rx="13" ry="6" fill="white"/>
+      <path d="M 467 105 Q 473 94 480 105" fill="white"/>
+      <path d="M 493 105 Q 487 94 480 105" fill="white"/>
+      <ellipse cx="491" cy="106" rx="4.5" ry="2.5" fill="#f0ece0"/>
+      <circle cx="494" cy="104" r="2" fill="#1a0808"/>
+      <ellipse cx="510" cy="118" rx="11" ry="5" fill="white" opacity="0.9"/>
+      <path d="M 499 115 Q 505 106 510 115" fill="white" opacity="0.9"/>
+      <path d="M 521 115 Q 515 106 510 115" fill="white" opacity="0.9"/>
+
+      {/* CAMELS — background left-center */}
+      <ellipse cx="222" cy="242" rx="36" ry="21" fill="#c8a058"/>
+      <ellipse cx="222" cy="222" rx="17" ry="21" fill="#b89048"/>
+      <path d="M 252 238 Q 270 220 272 202" stroke="#c8a058" strokeWidth="16" strokeLinecap="round" fill="none"/>
+      <ellipse cx="274" cy="195" rx="13" ry="17" fill="#c8a058"/>
+      <circle cx="280" cy="190" r="3" fill="#1a0808"/>
+      <path d="M 276 205 L 284 209 L 276 207 Z" fill="#a08038"/>
+      {[193,208,228,243].map((x,i)=><rect key={i} x={x} y="258" width="11" height="32" fill="#b09048" rx="5"/>)}
+    </svg>
+  );
+}
+
+function IlloNuhFlood() {
+  return (
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo5Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0e1828"/><stop offset="40%" stopColor="#1e2e40"/><stop offset="100%" stopColor="#2a4058"/>
+        </linearGradient>
+        <linearGradient id="gIllo5Water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#265a78"/><stop offset="100%" stopColor="#183850"/>
+        </linearGradient>
+        <linearGradient id="gIllo5Ark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8B5E2E"/><stop offset="100%" stopColor="#5a3810"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="300" fill="url(#gIllo5Sky)"/>
+      {/* Storm clouds — heavy and dark */}
+      {[[150,48,130,48],[100,57,84,38],[215,53,105,42],[400,32,145,52],[345,42,98,40],[470,40,118,44],[650,43,132,50],[600,53,90,38],[740,48,102,42]].map(([cx,cy,rx,ry],i)=>(
+        <ellipse key={i} cx={cx} cy={cy} rx={rx} ry={ry} fill={i%2===0?"#151e2a":"#101820"} opacity={i%2===0?0.95:0.9}/>
+      ))}
+      {/* Lightning */}
+      <path d="M 620 55 L 604 90 L 618 90 L 599 125" stroke="#e0e070" strokeWidth="3" fill="none" opacity="0.85"/>
+      {/* Rain streaks - static positions */}
+      {[[30,78],[46,83],[62,76],[78,82],[94,77],[110,84],[126,79],[142,83],[158,76],[174,82],[190,78],[206,84],[222,77],[238,82],[254,79],[270,83],[286,77],[302,82],[318,78],[334,83],[350,76],[366,81],[382,78],[398,83],[414,77],[430,82],[446,78],[462,84],[478,77],[494,82],[510,79],[526,83],[542,77],[558,82],[574,78],[590,83],[606,79],[622,82],[638,76],[654,81],[670,78],[686,83],[702,77],[718,82],[734,79],[750,83],[766,77],[782,82]].map(([x,y],i)=>(
+        <line key={i} x1={x} y1={y} x2={x-4} y2={y+22} stroke="rgba(180,210,240,0.52)" strokeWidth="1.6"/>
+      ))}
+      {/* Flood water */}
+      <rect x="0" y="175" width="800" height="125" fill="url(#gIllo5Water)"/>
+      {/* Waves */}
+      <path d="M 0 185 Q 80 173 160 187 Q 240 201 320 183 Q 400 167 480 185 Q 560 203 640 183 Q 720 165 800 185 L 800 198 L 0 198 Z" fill="#3a6888" opacity="0.75"/>
+      <path d="M 0 208 Q 90 196 180 210 Q 268 224 360 204 Q 450 186 540 208 Q 618 228 720 206 Q 762 196 800 210 L 800 222 L 0 222 Z" fill="#265878" opacity="0.7"/>
+      <path d="M 0 232 Q 100 220 200 234 Q 290 248 400 228 Q 500 210 600 232 Q 680 250 800 232 L 800 248 L 0 248 Z" fill="#1c4460" opacity="0.8"/>
+      {/* Submerged tree tops */}
+      <ellipse cx="75" cy="180" rx="18" ry="13" fill="#18302a" opacity="0.5"/>
+      <ellipse cx="175" cy="185" rx="22" ry="15" fill="#18302a" opacity="0.45"/>
+      <ellipse cx="655" cy="182" rx="20" ry="14" fill="#18302a" opacity="0.5"/>
+      <ellipse cx="748" cy="187" rx="18" ry="12" fill="#18302a" opacity="0.45"/>
+      {/* Submerged rooftops */}
+      <rect x="268" y="172" width="34" height="18" fill="#281808" opacity="0.35"/>
+      <path d="M 266 172 Q 285 160 304 172" fill="#281808" opacity="0.35"/>
+      <rect x="490" y="176" width="28" height="16" fill="#281808" opacity="0.3"/>
+
+      {/* THE ARK — floating high, lit windows */}
+      <path d="M 132 170 Q 127 154 150 144 L 640 144 Q 663 154 657 170 Z" fill="url(#gIllo5Ark)"/>
+      <line x1="150" y1="154" x2="638" y2="154" stroke="#4a2808" strokeWidth="2" opacity="0.6"/>
+      <line x1="144" y1="165" x2="644" y2="165" stroke="#4a2808" strokeWidth="2" opacity="0.6"/>
+      <rect x="162" y="112" width="462" height="34" fill="#7a4820" rx="2"/>
+      <line x1="162" y1="124" x2="624" y2="124" stroke="#5a3010" strokeWidth="2" opacity="0.5"/>
+      <rect x="175" y="100" width="440" height="14" fill="#6a3818" rx="2"/>
+      {[196,228,260,292,324,356,388,420,452,484,516,548,580,612].map((x,i)=>(
+        <rect key={i} x={x} y="92" width="5" height="10" fill="#4a2808" rx="1"/>
+      ))}
+      <rect x="195" y="90" width="430" height="4" fill="#5a3010" rx="2"/>
+      {/* Cabin */}
+      <rect x="272" y="68" width="234" height="44" fill="#8B5E2E" rx="3"/>
+      <path d="M 270 68 Q 389 48 508 68" fill="#6a4018"/>
+      {/* Lit windows */}
+      {[292,336,382,428,472].map((x,i)=>(
+        <g key={i}>
+          <rect x={x} y="78" width="20" height="15" fill="#f0d070" rx="2" opacity="0.9"/>
+          <ellipse cx={x+10} cy={84} rx="14" ry="9" fill="rgba(240,200,70,0.15)"/>
+        </g>
+      ))}
+      {/* Mast */}
+      <rect x="387" y="22" width="8" height="96" fill="#4a2808" rx="2"/>
+      <path d="M 395 22 L 395 54 L 445 40 Z" fill="#d0c090" opacity="0.65"/>
+      {/* Believers on deck */}
+      {[[218,105],[258,102],[535,104],[570,103]].map(([x,y],i)=>(
+        <circle key={i} cx={x} cy={y} r={i===0?9:7} fill="#c09060"/>
+      ))}
+      {/* Nuh at bow, arms raised in prayer */}
+      <circle cx="178" cy="104" r="10" fill="#c09060"/>
+      <path d="M 170 114 Q 165 134 167 146 Q 178 142 189 146 Q 191 134 186 114 Z" fill="#f0e8d0"/>
+      <path d="M 186 120 Q 200 106 207 97" stroke="#c09060" strokeWidth="9" strokeLinecap="round" fill="none"/>
+      <path d="M 170 120 Q 156 114 149 110" stroke="#c09060" strokeWidth="9" strokeLinecap="round" fill="none"/>
+      <path d="M 168 97 Q 178 86 188 97 Q 182 92 178 90 Q 174 92 168 97 Z" fill="#eee8c0"/>
+      <path d="M 171 107 Q 175 118 178 120 Q 181 118 185 107 Q 181 113 178 114 Q 175 113 171 107 Z" fill="#9a7830"/>
+      {/* Wave foam/whitecaps */}
+      {[[248,196],[528,208],[350,220],[678,200]].map(([x,y],i)=>(
+        <ellipse key={i} cx={x} cy={y} rx={18+i*2} ry={4+i%2} fill="white" opacity={0.28}/>
+      ))}
+    </svg>
+  );
+}
+
+function IlloNuhDove() {
+  return (
+    <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo6Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#b8d0e8"/><stop offset="50%" stopColor="#e0e0c0"/><stop offset="100%" stopColor="#f0d870"/>
+        </linearGradient>
+        <linearGradient id="gIllo6Water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#4888a8"/><stop offset="100%" stopColor="#286080"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="260" fill="url(#gIllo6Sky)"/>
+      {/* Breaking clouds - clearing */}
+      <ellipse cx="110" cy="42" rx="85" ry="32" fill="rgba(170,185,198,0.48)"/>
+      <ellipse cx="685" cy="36" rx="95" ry="35" fill="rgba(170,185,198,0.45)"/>
+      {/* SUNRISE golden glow */}
+      <ellipse cx="400" cy="130" rx="400" ry="130" fill="rgba(240,200,80,0.1)"/>
+      <circle cx="400" cy="4" r="48" fill="rgba(240,210,100,0.68)"/>
+      <ellipse cx="400" cy="0" rx="78" ry="28" fill="rgba(240,210,100,0.48)"/>
+      {[0,30,60,90,120,150,210,240,270,300,330].map((angle,i)=>{
+        const rad = angle * Math.PI / 180;
+        return <line key={i} x1={400+Math.sin(rad)*50} y1={Math.max(0,4-Math.cos(rad)*48)} x2={400+Math.sin(rad)*80} y2={Math.max(0,4-Math.cos(rad)*76)} stroke="rgba(240,200,80,0.28)" strokeWidth="20"/>;
+      })}
+      {/* Receding water */}
+      <rect x="0" y="168" width="800" height="92" fill="url(#gIllo6Water)"/>
+      <path d="M 0 176 Q 100 164 200 178 Q 320 192 440 172 Q 560 154 680 178 Q 740 190 800 175 L 800 190 L 0 190 Z" fill="#5898b8" opacity="0.55"/>
+      <path d="M 0 198 Q 150 188 300 200 Q 450 212 600 196 Q 700 184 800 200 L 800 215 L 0 215 Z" fill="#387898" opacity="0.5"/>
+      {/* Mountain peaks emerging! */}
+      <path d="M 0 225 Q 32 172 80 156 Q 118 144 148 162 Q 178 178 198 232 Z" fill="#7a6038"/>
+      <path d="M 72 170 Q 102 150 120 167" stroke="#9a8048" strokeWidth="3" fill="none" opacity="0.7"/>
+      <path d="M 640 232 Q 668 177 708 160 Q 746 144 773 164 Q 800 182 800 232 Z" fill="#706038"/>
+      {/* Green on mountain tops — life returning */}
+      <circle cx="82" cy="160" r="9" fill="#2d6a2d"/>
+      <circle cx="96" cy="164" r="7" fill="#3a7a3a"/>
+      <circle cx="712" cy="164" r="8" fill="#2d6a2d"/>
+      <circle cx="726" cy="160" r="6" fill="#3a7a3a"/>
+
+      {/* THE ARK — in background, smaller */}
+      <path d="M 282 156 Q 278 146 296 141 L 510 141 Q 526 146 520 156 Z" fill="#7a4818"/>
+      <rect x="298" y="124" width="210" height="20" fill="#6a3e18" rx="2"/>
+      <rect x="314" y="114" width="180" height="12" fill="#5a3010" rx="2"/>
+      <rect x="335" y="97" width="120" height="20" fill="#7a4818" rx="2"/>
+      <path d="M 333 97 Q 395 84 457 97" fill="#5a3010"/>
+      {/* Cabin windows glowing */}
+      {[350,390,430].map((x,i)=>(
+        <rect key={i} x={x} y="104" width="18" height="12" fill="#f0d070" rx="2" opacity="0.9"/>
+      ))}
+      <rect x="392" y="60" width="5" height="64" fill="#4a2808" rx="1"/>
+      {/* Believers on deck — arms raised, celebrating */}
+      {[[312,116],[334,114],[486,116],[505,114]].map(([x,y],i)=>(
+        <g key={i}>
+          <circle cx={x} cy={y} r={6} fill="#c09060"/>
+          <line x1={x} y1={y+6} x2={x-7} y2={y-5} stroke="#c09060" strokeWidth="4" strokeLinecap="round"/>
+          <line x1={x} y1={y+6} x2={x+7} y2={y-5} stroke="#c09060" strokeWidth="4" strokeLinecap="round"/>
+        </g>
+      ))}
+
+      {/* THE DOVE — large and prominent, returning with olive branch */}
+      {/* Body */}
+      <ellipse cx="578" cy="82" rx="30" ry="15" fill="white"/>
+      {/* Left wing sweeping up */}
+      <path d="M 548 82 Q 514 50 500 62 Q 524 68 548 86 Z" fill="white"/>
+      <path d="M 548 82 Q 510 60 498 75 Q 524 75 548 90 Z" fill="#f0ede0"/>
+      {/* Right wing down */}
+      <path d="M 608 82 Q 645 108 660 96 Q 636 90 608 78 Z" fill="white"/>
+      <path d="M 608 82 Q 650 104 664 90 Q 636 86 608 75 Z" fill="#f0ede0"/>
+      {/* Tail */}
+      <path d="M 548 88 Q 530 96 522 94 Q 535 91 548 85 Z" fill="#e8e5d5"/>
+      {/* Head */}
+      <ellipse cx="612" cy="78" rx="17" ry="15" fill="white"/>
+      {/* Beak */}
+      <path d="M 627 82 L 648 77 L 627 85 Z" fill="#e8b040"/>
+      {/* Olive branch in beak */}
+      <path d="M 640 79 Q 664 71 682 75 Q 700 79 712 73" stroke="#3a6820" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      {/* Leaves */}
+      {[[655,72,'-15'],[668,70,'-25'],[682,72,'10'],[696,71,'-18']].map(([x,y,rot],i)=>(
+        <ellipse key={i} cx={x} cy={y} rx={i<2?8:7} ry={i<2?4:3.5} fill={i%2===0?"#4a8030":"#3a7020"} transform={`rotate(${rot},${x},${y})`}/>
+      ))}
+      {/* Olive berries */}
+      {[[660,76],[675,74],[690,75]].map(([x,y],i)=>(
+        <circle key={i} cx={x} cy={y} r={2.8} fill="#6a9838"/>
+      ))}
+      {/* Dove eye */}
+      <circle cx="618" cy="75" r="3.5" fill="#1a0808"/>
+      <circle cx="619" cy="74" r="1.2" fill="white"/>
+      {/* Dove shadow on water */}
+      <ellipse cx="520" cy="185" rx="25" ry="6" fill="rgba(0,0,0,0.09)"/>
+      {/* Golden light beam */}
+      <path d="M 355 0 Q 380 75 400 130" stroke="rgba(240,200,80,0.1)" strokeWidth="65" fill="none"/>
+    </svg>
+  );
+}
+
+function IlloNuhNewWorld() {
+  return (
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100%',height:'auto'}}>
+      <defs>
+        <linearGradient id="gIllo7Sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#4890c8"/><stop offset="50%" stopColor="#88c0e0"/><stop offset="100%" stopColor="#c0e8b8"/>
+        </linearGradient>
+        <linearGradient id="gIllo7Mtn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#7a8060"/><stop offset="100%" stopColor="#5a6040"/>
+        </linearGradient>
+        <linearGradient id="gIllo7Grn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#5a8840"/><stop offset="100%" stopColor="#3a6020"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="300" fill="url(#gIllo7Sky)"/>
+      {/* Fluffy white clouds */}
+      {[[128,48,78,28],[96,54,53,22],[170,52,63,24],[582,38,88,30],[546,46,58,23],[638,43,68,26]].map(([cx,cy,rx,ry],i)=>(
+        <ellipse key={i} cx={cx} cy={cy} rx={rx} ry={ry} fill="white" opacity={i%2===0?0.85:0.8}/>
+      ))}
+      {/* RAINBOW */}
+      {[
+        [8,270,'rgba(255,100,100,0.32)'],['rgba(255,165,0,0.32)'],['rgba(255,220,0,0.32)'],
+        ['rgba(100,200,100,0.32)'],['rgba(60,120,220,0.32)'],['rgba(120,60,200,0.28)']
+      ].map((item,i)=>{
+        const offset = i * 15;
+        const color = typeof item === 'string' ? item : item[2] || item[0];
+        return <path key={i} d={`M ${50+offset} 295 Q 400 ${-20+i*18} ${750-offset} 295`} stroke={color} strokeWidth="7" fill="none"/>;
+      })}
+      {/* Sun */}
+      <circle cx="688" cy="52" r="40" fill="#fff8c0" opacity="0.95"/>
+      <circle cx="688" cy="52" r="28" fill="#ffe870"/>
+      {[0,45,90,135,180,225,270,315].map((angle,i)=>{
+        const rad = angle * Math.PI / 180;
+        return <line key={i} x1={688+Math.sin(rad)*30} y1={52-Math.cos(rad)*30} x2={688+Math.sin(rad)*46} y2={52-Math.cos(rad)*46} stroke="#ffe870" strokeWidth="3" opacity={0.65}/>;
+      })}
+      {/* Mount Judi */}
+      <path d="M 95 298 Q 198 175 315 126 Q 400 102 488 128 Q 606 178 706 298 Z" fill="url(#gIllo7Mtn)"/>
+      <path d="M 278 170 Q 318 136 400 114 Q 442 126 482 152" stroke="#9a9870" strokeWidth="3" fill="none" opacity="0.65"/>
+      <path d="M 370 108 Q 400 96 430 108 Q 414 104 400 102 Q 386 104 370 108 Z" fill="white" opacity="0.8"/>
+      {/* Green slopes */}
+      <path d="M 148 285 Q 248 235 348 214 Q 400 208 452 214 Q 552 235 652 285 Z" fill="url(#gIllo7Grn)"/>
+      {/* Flowers on slopes */}
+      {[[248,255,'#e8d040'],[272,248,'#f0a030'],[298,253,'#e84040'],[325,246,'#e8d040'],[478,248,'#e84040'],[505,254,'#f0a030'],[530,246,'#e8d040'],[558,252,'#e84040']].map(([x,y,fill],i)=>(
+        <circle key={i} cx={x} cy={y} r={5} fill={fill}/>
+      ))}
+      {/* Green shoots */}
+      {[[265,263],[342,256],[462,250],[542,258]].map(([x,y],i)=>(
+        <path key={i} d={`M ${x} ${y} Q ${x-3} ${y-10} ${x+3} ${y-6}`} stroke="#3a7020" strokeWidth="2" fill="none"/>
+      ))}
+      {/* ARK resting on slope */}
+      <path d="M 148 210 Q 144 196 162 190 L 462 190 Q 478 196 472 210 Z" fill="#7a4818"/>
+      <line x1="162" y1="198" x2="460" y2="198" stroke="#4a2808" strokeWidth="2" opacity="0.6"/>
+      <line x1="156" y1="207" x2="464" y2="207" stroke="#4a2808" strokeWidth="2" opacity="0.6"/>
+      <rect x="172" y="160" width="280" height="32" fill="#6a3818" rx="2"/>
+      <rect x="185" y="149" width="258" height="14" fill="#5a2e10" rx="2"/>
+      <rect x="218" y="124" width="178" height="38" fill="#7a4818" rx="3"/>
+      <path d="M 216 124 Q 307 104 398 124" fill="#5a3010"/>
+      {/* Lit windows */}
+      {[234,274,326,370].map((x,i)=>(
+        <rect key={i} x={x} y="134" width="18" height="14" fill="#f0d880" rx="2" opacity="0.9"/>
+      ))}
+      {/* Ramp / door open */}
+      <path d="M 292 190 Q 292 218 278 230 L 348 230 Q 334 218 334 190 Z" fill="#8B5E2E"/>
+      <line x1="313" y1="190" x2="313" y2="230" stroke="#5a3010" strokeWidth="2" opacity="0.5"/>
+
+      {/* BELIEVERS emerging */}
+      {/* Prostrating in gratitude */}
+      <circle cx="258" cy="238" r="8" fill="#c09060"/>
+      <path d="M 258 246 Q 242 252 232 257 Q 246 257 266 255 Q 268 250 258 246 Z" fill="#e8e0c0"/>
+      <ellipse cx="234" cy="258" rx="10" ry="4.5" fill="#c09060"/>
+      {/* Hands raised in Dua */}
+      <circle cx="338" cy="228" r="9" fill="#c09060"/>
+      <path d="M 330 237 Q 326 256 328 270 Q 338 266 348 270 Q 350 255 346 237 Z" fill="#f0e8d0"/>
+      <path d="M 330 242 Q 315 230 307 220" stroke="#c09060" strokeWidth="8" strokeLinecap="round" fill="none"/>
+      <path d="M 346 242 Q 361 230 369 220" stroke="#c09060" strokeWidth="8" strokeLinecap="round" fill="none"/>
+      <circle cx="305" cy="218" r="7" fill="#c09060"/>
+      <circle cx="371" cy="218" r="7" fill="#c09060"/>
+      <path d="M 329 222 Q 338 210 347 222 Q 342 216 338 214 Q 334 216 329 222 Z" fill="#eee8c0"/>
+      <path d="M 332 231 Q 335 242 338 244 Q 341 242 344 231 Q 341 237 338 239 Q 335 237 332 231 Z" fill="#9a7830"/>
+      {/* Child running free */}
+      <circle cx="408" cy="235" r="7" fill="#b88050"/>
+      <path d="M 402 242 Q 395 258 396 268 Q 406 265 414 268 Q 416 257 410 242 Z" fill="#d0c080"/>
+      <path d="M 402 248 Q 390 251 382 253" stroke="#b88050" strokeWidth="7" strokeLinecap="round" fill="none"/>
+      <path d="M 410 248 Q 420 244 427 242" stroke="#b88050" strokeWidth="7" strokeLinecap="round" fill="none"/>
+      {/* Woman pointing at rainbow */}
+      <circle cx="448" cy="230" r="8" fill="#c09060"/>
+      <path d="M 430 224 Q 440 210 456 224 Q 448 218 440 217 Q 436 218 430 224 Z" fill="#d0a060"/>
+      <path d="M 440 238 Q 440 254 438 266 Q 448 262 458 266 Q 456 254 456 238 Z" fill="#8a6040"/>
+      <path d="M 456 237 Q 470 222 480 210" stroke="#c09060" strokeWidth="8" strokeLinecap="round" fill="none"/>
+      <circle cx="482" cy="208" r="6" fill="#c09060"/>
+
+      {/* Animals bounding free */}
+      {/* Small deer */}
+      <ellipse cx="178" cy="262" rx="18" ry="10" fill="#c8a050"/>
+      <path d="M 193 256 Q 205 242 204 254" stroke="#c8a050" strokeWidth="8" strokeLinecap="round" fill="none"/>
+      <ellipse cx="207" cy="250" rx="10" ry="12" fill="#c8a050"/>
+      <line x1="203" y1="246" x2="198" y2="234" stroke="#a08030" strokeWidth="3" strokeLinecap="round"/>
+      <line x1="210" y1="246" x2="215" y2="234" stroke="#a08030" strokeWidth="3" strokeLinecap="round"/>
+      {[170,182,193,200].map((x,i)=><line key={i} x1={x} y1="272" x2={x+i%2?3:-2} y2="288" stroke="#b89040" strokeWidth="5" strokeLinecap="round"/>)}
+      {/* Birds flying free */}
+      {[[522,138,10,5],[548,150,9,4.5]].map(([cx,cy,rx,ry],i)=>(
+        <g key={i}>
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={i===0?"#e8e080":"#d8d070"} opacity={i===0?1:0.9}/>
+          <path d={`M ${cx-rx} ${cy-1} Q ${cx-rx+6} ${cy-rx-2} ${cx} ${cy-1}`} fill={i===0?"#e8e080":"#d8d070"} opacity={i===0?1:0.9}/>
+          <path d={`M ${cx+rx} ${cy-1} Q ${cx+rx-6} ${cy-rx-2} ${cx} ${cy-1}`} fill={i===0?"#e8e080":"#d8d070"} opacity={i===0?1:0.9}/>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+// Map of illustration keys to components
+const ILLO_MAP = {
+  NuhIdols:     IlloNuhIdols,
+  NuhPreaches:  IlloNuhPreaches,
+  NuhBuildsArk: IlloNuhBuildsArk,
+  NuhAnimals:   IlloNuhAnimals,
+  NuhFlood:     IlloNuhFlood,
+  NuhDove:      IlloNuhDove,
+  NuhNewWorld:  IlloNuhNewWorld,
+};
+
 const BOOKS = [
-  // ── PROPHETS ──────────────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════
+  // ★ ILLUSTRATED STORIES — Rich inline SVG artwork, 3-4 chapters
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: 'hazrat-nuh',
+    title: 'Hazrat Nuh (as) & the Great Ark',
+    category: 'prophets',
+    categoryLabel: 'Prophets of Allah',
+    scene: 'desert',
+    coverColor: 'linear-gradient(135deg,#0a2a4a,#1a4a2a)',
+    desc: 'The incredible true story of Prophet Nuh — who preached for 950 years, built the greatest ship the world had ever seen, and saved every creature on Earth.',
+    source: 'Holy Quran / alislam.org',
+    isNew: true,
+    isIllustrated: true,
+    chapters: [
+      {
+        id: 'ch1', num: 1,
+        title: 'A World That Had Forgotten Allah',
+        scene: 'desert',
+        sceneCaption: 'Long ago, people had turned away from Allah and worshipped idols of stone',
+        content: [
+          "Long, long ago — so long ago that no written history can reach it — there lived a people who had forgotten their Creator. They were not always like this. Once, their ancestors had known the truth. Once, they had worshipped Allah alone, prayed to Him, and lived in peace.",
+          "But slowly, over many generations, they drifted away. They began to make statues of their great and righteous elders — people who had died, people they loved and respected. At first, the statues were just to remember them by. But then they started to bow to the statues. Then to pray to them. Then to offer sacrifices before them. And Allah was forgotten.",
+          { type: 'illo', illoKey: 'NuhIdols', caption: "The five great idols of the people of Nuh — Wadd, Suwa, Yaghuth, Ya’uq, and Nasr — surrounded by worshippers" },
+          "These were the five great idols of the people of Nuh — Wadd, Suwa, Yaghuth, Ya'uq, and Nasr. They bowed before them, burned offerings to them, and asked them for rain, for children, for good harvests. They had completely forgotten that it was Allah — the Creator of all things — who actually gave them everything.",
+          "Into this world, Allah chose to send a messenger. His name was Nuh — and he would spend his entire life trying to bring his people back to the truth. He would preach for so long that no other prophet in history would preach as long as he did.",
+          { type: 'break', label: '❖ Page 2 ❖' },
+          "Hazrat Nuh (peace be upon him) was a man of extraordinary patience and deep love for his people. He knew they were heading toward destruction — not because Allah did not love them, but because they were turning away from the very source of all love and mercy.",
+          "He called to them gently at first. He would walk through the markets and speak to people in the daytime. <span class='story-highlight'>He would visit them privately in their homes, so they would not feel embarrassed in front of others.</span> He reasoned with them — he pointed to the sky, the rain, the crops, the stars. He said: look at all of this. Who made it? Who keeps it running day after day?",
+          "But the powerful chiefs did not want to listen. They said: 'You are just a human being like us. Why should we follow you? The only ones who follow you are the lowly and the poor.' They were too proud to sit with the poor. They were too proud to admit they might be wrong.",
+          { type: 'illo', illoKey: 'NuhPreaches', caption: "Hazrat Nuh (as) preaches with his arm raised — the proud chiefs turn away while the humble believers listen" },
+          "Hazrat Nuh (as) did not give up. For year after year — decade after decade — he continued. He promised them that if they turned back to the truth, Allah would send them rain in abundance, bless their children, and give them gardens and rivers. But they stopped their ears with their fingers and pulled their cloaks over their faces so they would not have to hear him.",
+        ],
+        learned: [
+          'Pride and arrogance are the greatest barriers to faith — the chiefs rejected truth because they thought they were too important to accept it.',
+          'Allah sends prophets out of love and mercy — to warn people before the consequences of their choices arrive.',
+          'True patience means continuing to speak truth even when nobody seems to be listening.',
+        ],
+        moral: "The greatest enemy of truth is not an argument — it is a heart that has decided it doesn't want to know."
+      },
+      {
+        id: 'ch2', num: 2,
+        title: 'Build the Ark',
+        scene: 'desert',
+        sceneCaption: 'In the middle of the desert, Nuh began building a ship bigger than any ship ever seen',
+        content: [
+          "After centuries of patient preaching — 950 years, the Quran tells us — Allah revealed to Hazrat Nuh (as) that no more people would believe. And Allah informed His beloved prophet that a great punishment was coming — a flood unlike anything the world had ever seen.",
+          "Allah commanded Hazrat Nuh (as) to build an ark. Not a small boat. A massive vessel — large enough to carry every kind of creature on Earth, along with the small group of believers who had remained faithful.",
+          { type: 'illo', illoKey: 'NuhBuildsArk', caption: "Hazrat Nuh (as) directs the believers as they build the great Ark — mockers laugh from a distance" },
+          "The mockers could not believe their eyes. Here was a man — in the middle of dry land, far from any sea — building an enormous ship. They came to laugh. They pointed and jeered: <span class='story-highlight'>'O Nuh! You have become a carpenter now? Where is this sea you plan to sail?'</span>",
+          "Hazrat Nuh (as) looked at them calmly and said: 'You will soon know who will face a humiliating punishment, and upon whom will descend an everlasting one.'",
+          { type: 'break', label: '❖ Page 2 ❖' },
+          "The ark grew. Plank by plank, day by day, the believers worked. They waterproofed it with pitch — a thick black tar that sealed every gap. They built compartments inside for the animals. They built great storage for food. And then came Allah's command: when the oven in your house begins to overflow with water, know that the flood is beginning. Take two of every kind of creature — male and female. Take the believers with you.",
+          { type: 'illo', illoKey: 'NuhAnimals', caption: "The animals come to the Ark two by two — elephants, giraffes, lions, camels, and doves all answer Allah's call" },
+          "And the animals came. Two by two, they arrived — lions walking peacefully beside the animals they would normally hunt, birds settling on the deck, elephants lumbering up the great ramp, camels kneeling to enter. These creatures, led by the command of their Creator, came to be saved.",
+          "The son of Hazrat Nuh (as) refused to board. He said he would climb to a high mountain and be safe there. Hazrat Nuh called out with a father's aching heart: <span class='story-highlight'>'O my dear son, come aboard with us, and do not be with the disbelievers!'</span> But the son refused. And the great wave came between them.",
+        ],
+        learned: [
+          'Obedience to Allah protects us — even the animals were led to safety through His command.',
+          'Faith cannot be inherited — every person must choose it for themselves, even if their father is a prophet.',
+          'The mockers always have something to say — but the one who trusts in Allah keeps building.',
+        ],
+        moral: "Build what Allah commands, even when the world laughs — because the flood comes for everyone, and only the ark can save you."
+      },
+      {
+        id: 'ch3', num: 3,
+        title: 'Forty Days of Rain',
+        scene: 'desert',
+        sceneCaption: 'The skies opened and water poured from above and gushed from below',
+        content: [
+          "And then it began. First a sound — a deep, low rumbling from the sky. Then the first drops. Then more. Then the clouds ripped open and rain fell in sheets so thick you could barely see your hand in front of your face.",
+          { type: 'illo', illoKey: 'NuhFlood', caption: "The Great Flood — the Ark floats high on dark churning waters as the world below disappears" },
+          "The Quran tells us that the water came from two directions at once — from the sky above, and from springs that burst open in the earth below. The whole land flooded. The valleys filled. The hills disappeared. And then the mountains themselves began to go under.",
+          { type: 'break', label: '❖ Page 2 ❖' },
+          "Inside the ark, the believers prayed. The ark moved across the face of the deep water, rocking gently, protected by the care of its Creator. Hazrat Nuh (as) spoke the words that have rung across history: <span class='story-highlight'>'In the name of Allah, it moves and it rests.'</span>",
+          "Hazrat Nuh stood at the side of the ark and saw his son climbing higher and higher up a mountain slope as the waters rose. 'O my dear son! Come with us!' But a great wave rose between them, and Hazrat Nuh saw his son no more. Even a prophet's son can be lost — not because the father did not love him, but because faith cannot be forced.",
+          { type: 'illo', illoKey: 'NuhDove', caption: "The dove returns carrying a fresh olive branch — the waters are receding, land and life are returning" },
+          "After many days, Hazrat Nuh (as) sent a dove out from the ark. The dove returned — and in its beak was a fresh, green olive branch. Hazrat Nuh (as) knew: the earth was appearing again. The waters were going down. Allah had kept His promise.",
+        ],
+        learned: [
+          'Faith is not just believing — it is trusting Allah even when you cannot see where the ark is going.',
+          'Allah can protect us in the middle of the worst storm — if we are with Him.',
+          'The olive branch has been a symbol of peace and hope ever since — because of this very moment.',
+        ],
+        moral: "No flood is too great for the one who sails in Allah's protection. Say 'In the name of Allah' — and trust the voyage."
+      },
+      {
+        id: 'ch4', num: 4,
+        title: 'The Ark Rests and a New Beginning',
+        scene: 'garden',
+        sceneCaption: 'The ark came to rest on Mount Judi — and the world was made new',
+        content: [
+          "And then, by the command of Allah, the flood ended. The Quran says: <span class='story-highlight'>'O Earth, swallow your water! O Sky, withhold your rain!'</span> And the water sank into the earth, and the rain stopped, and the sky cleared.",
+          "The ark came to rest upon a mountain called Al-Judi. The door opened. And the believers stepped out onto clean, wet earth — a world washed and renewed. They breathed fresh air. They saw blue sky. They heard birds. They felt the solid ground under their feet after all those weeks on the water.",
+          { type: 'illo', illoKey: 'NuhNewWorld', caption: "The Ark rests on Mount Judi — believers emerge into a fresh new world with a rainbow arching across the sky" },
+          "And then something appeared in the sky that had never meant what it meant now. A great rainbow arched across the clearing sky. It was Allah's sign — a covenant with Hazrat Nuh and with all of creation: never again would a flood be sent to destroy the whole Earth.",
+          { type: 'break', label: '❖ Page 2 ❖' },
+          "The believers fell in prostration. They cried with relief and joy and gratitude. Hazrat Nuh (as) raised his hands and made a long prayer of thanks — thanking Allah for His mercy, for the ark, for every wave that had passed beneath them safely.",
+          "Allah spoke to Hazrat Nuh (as): <span class='story-highlight'>'O Nuh, descend with peace from Us and with blessings upon you and upon the peoples who are with you.'</span>",
+          "The people spread across the earth again. From that small group of believers, the world was repopulated. And the story of the ark became one of the greatest stories ever told — in the Torah, in the Bible, and in the Holy Quran. Because Allah wanted every generation to remember: stay with the truth, build what Allah commands, and trust the voyage.",
+        ],
+        learned: [
+          'The rainbow is Allah's sign of mercy and promise — a reminder that His mercy always follows His judgment.',
+          "Even after loss and grief, Allah's blessing descends — 'Peace from Us' are the most comforting words imaginable.",
+          'One family of believers was enough to restore the world — never underestimate the power of a faithful few.',
+        ],
+        moral: "The rainbow after every storm is Allah's way of saying: I was with you the whole time. The promise never broke."
+      }
+    ],
+    quizQuestions: [
+      { q: "What were the five great idols worshipped by the people of Nuh?", options: ["Baal, Ra, Zeus, Marduk, Ishtar","Wadd, Suwa, Yaghuth, Ya'uq, Nasr","Hubal, Lat, Uzza, Manat, Nasr","Dagon, Moloch, Baal, Ra, Osiris"], answer: 1, explain: "The Quran names the five idols as Wadd, Suwa, Yaghuth, Ya'uq and Nasr — each representing something the people once loved and then began to worship." },
+      { q: "How long did Hazrat Nuh (as) preach to his people?", options: ["40 years","100 years","500 years","950 years"], answer: 3, explain: "The Quran tells us that Hazrat Nuh preached for 950 years — making him the prophet with the longest mission in history." },
+      { q: "What was unusual about where Hazrat Nuh built the ark?", options: ["He built it in the sea","He built it on a mountaintop","He built it in the middle of dry land, far from any water","He built it underground"], answer: 2, explain: "He built the enormous ark on dry land — which the mockers found hilarious. But Nuh trusted Allah's command completely." },
+      { q: "What did the dove bring back to the ark?", options: ["A handful of mud","A fresh green olive branch","A red flower","A stone from the mountaintop"], answer: 1, explain: "The dove returned with a fresh olive branch — showing that trees were appearing above the water. The dove and olive branch became symbols of hope." },
+      { q: "On which mountain did the ark come to rest?", options: ["Mount Sinai","Mount Ararat","Mount Judi","Mount Uhud"], answer: 2, explain: "The Quran specifically names the mountain as Al-Judi, where the ark rested when the flood waters receded." },
+      { q: "What did Allah put in the sky as a sign of His promise after the flood?", options: ["A bright star","A new moon","A rainbow","A pillar of light"], answer: 2, explain: "A rainbow appeared — Allah's covenant that the whole Earth would never be flooded again." }
+    ]
+  },
   {
     id: 'hazrat-hud',
     title: 'Hazrat Hud (as)',
@@ -1715,7 +2574,10 @@ function BookReader({ book, profile, username, onBack, onProfileUpdate, voice })
               {voice && voice.voiceOn && (
                 <button className="voice-ctrl-btn primary" style={{flexShrink:0}}
                   onClick={() => {
-                    const fullText = ch.content.map(p => p.replace(/<[^>]+>/g,'')).join('. ');
+                    const fullText = ch.content
+                      .filter(item => typeof item === 'string')
+                      .map(p => p.replace(/<[^>]+>/g,''))
+                      .join('. ');
                     voice.speak(fullText);
                   }}
                   title="Read entire chapter aloud">
@@ -1725,18 +2587,37 @@ function BookReader({ book, profile, username, onBack, onProfileUpdate, voice })
             </div>
           </div>
           <div className="story-body">
-            {ch.content.map((para,i) => (
-              <p key={i} style={{position:'relative'}}>
-                <span dangerouslySetInnerHTML={{__html: para}}/>
-                {voice && voice.voiceOn && (
-                  <button className="voice-para-btn"
-                    onClick={() => voice.speak(para)}
-                    title="Read this paragraph aloud">
-                    🔊
-                  </button>
-                )}
-              </p>
-            ))}
+            {ch.content.map((item,i) => {
+              // Illustration block using named component map
+              if (item && typeof item === 'object' && item.type === 'illo') {
+                const IlloComp = item.illoKey ? ILLO_MAP[item.illoKey] : null;
+                if (!IlloComp) return null;
+                return (
+                  <div key={i} className="story-illo">
+                    <IlloComp/>
+                    {item.caption && <div className="story-illo-caption">{item.caption}</div>}
+                  </div>
+                );
+              }
+              // Page break divider
+              if (item && typeof item === 'object' && item.type === 'break') {
+                return <div key={i} className="story-page-break"><span className="story-page-break-icon">{item.label || '✦'}</span></div>;
+              }
+              // Normal paragraph
+              const para = typeof item === 'string' ? item : '';
+              return (
+                <p key={i} style={{position:'relative'}}>
+                  <span dangerouslySetInnerHTML={{__html: para}}/>
+                  {voice && voice.voiceOn && para && (
+                    <button className="voice-para-btn"
+                      onClick={() => voice.speak(para)}
+                      title="Read this paragraph aloud">
+                      🔊
+                    </button>
+                  )}
+                </p>
+              );
+            })}
           </div>
           <div className="lesson-box">
             <div className="lesson-box-title">📖 What We Learned</div>
