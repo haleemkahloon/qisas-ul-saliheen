@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Qisas-ul-Saliheen — Stories of the Righteous</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:wght@400;600;700;800;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --parchment:#fdf6e3;
+  --parchment2:#f5e6c8;
+  --ink:#2c1810;
+  --ink2:#4a3728;
+  --gold:#c9942a;
+  --gold2:#e8b84b;
+  --teal:#1a6b6b;
+  --teal2:#2a9090;
+  --rose:#8b3a3a;
+  --green:#2d6a4f;
+  --blue:#1a4a7a;
+  --muted:#7a6a5a;
+  --border:#d4b896;
+  --white:#fff;
+  --shadow:rgba(44,24,16,0.15);
+  --font-body:'Lora',Georgia,serif;
+  --font-ui:'Nunito',sans-serif;
+  --font-title:'Cinzel',serif;
+}
+html,body,#root{height:100%;margin:0}
+body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--parchment2)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes pageFlip{from{opacity:0;transform:rotateY(-8deg) translateX(-20px)}to{opacity:1;transform:rotateY(0) translateX(0)}}
+@keyframes starPop{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+
+.fade-up{animation:fadeUp 0.5s ease forwards}
+.fade-in{animation:fadeIn 0.4s ease forwards}
+.page-enter{animation:pageFlip 0.5s ease forwards}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(135deg,#1a2a1a 0%,#2c1810 40%,#1a2a40 100%);
+  padding:0 28px;
+  height:68px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  flex-shrink:0;
+  position:relative;
+  overflow:hidden;
+}
+.header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9942a' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-logo{font-family:var(--font-title);font-size:22px;color:var(--gold2);font-weight:700;letter-spacing:1px;position:relative}
+.header-logo span{display:block;font-size:10px;color:rgba(232,184,75,0.7);font-family:var(--font-ui);font-weight:600;letter-spacing:3px;text-transform:uppercase;margin-top:1px}
+.header-crescent{font-size:28px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(201,148,42,0.5))}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.header-btn{padding:7px 16px;border-radius:20px;border:1.5px solid rgba(201,148,42,0.4);background:transparent;color:rgba(232,184,75,0.8);font-family:var(--font-ui);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px}
+.header-btn:hover,.header-btn.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(201,148,42,0.15);border:1px solid rgba(201,148,42,0.3)}
+.user-badge-name{font-family:var(--font-ui);font-size:12px;font-weight:800;color:var(--gold2)}
+.user-badge-icon{font-size:18px}
+
+/* ===== LAYOUT ===== */
+.app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.main-layout{flex:1;display:flex;overflow:hidden}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:linear-gradient(180deg,#2c1810 0%,#1a2a2a 100%);
+  display:flex;flex-direction:column;
+  border-right:2px solid var(--gold);
+  overflow-y:auto;
+  position:relative;
+}
+.sidebar::after{
+  content:'';position:absolute;top:0;right:0;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,var(--gold2),transparent);
+}
+.sidebar-section{padding:20px 16px 8px}
+.sidebar-section-title{
+  font-family:var(--font-ui);font-size:9px;font-weight:800;
+  color:rgba(201,148,42,0.6);letter-spacing:3px;text-transform:uppercase;
+  padding:0 4px;margin-bottom:12px;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  cursor:pointer;transition:all 0.2s;
+  border:1px solid transparent;
+  margin-bottom:4px;
+}
+.sidebar-item:hover{background:rgba(201,148,42,0.12);border-color:rgba(201,148,42,0.2)}
+.sidebar-item.active{background:rgba(201,148,42,0.2);border-color:rgba(201,148,42,0.4)}
+.sidebar-item-icon{font-size:20px;flex-shrink:0}
+.sidebar-item-text{flex:1}
+.sidebar-item-name{font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--parchment);line-height:1.2}
+.sidebar-item-sub{font-family:var(--font-ui);font-size:10px;color:rgba(253,246,227,0.5);font-weight:600;margin-top:1px}
+.sidebar-item-badge{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  padding:2px 7px;border-radius:10px;
+  background:var(--gold);color:var(--ink);
+}
+.sidebar-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(201,148,42,0.3),transparent);margin:8px 16px}
+
+/* PDF Section */
+.pdf-section{
+  margin:12px;border-radius:12px;
+  background:rgba(201,148,42,0.08);
+  border:1px solid rgba(201,148,42,0.2);
+  overflow:hidden;
+}
+.pdf-section-header{
+  padding:12px 14px;
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+  border-bottom:1px solid rgba(201,148,42,0.15);
+}
+.pdf-section-title{font-family:var(--font-ui);font-size:11px;font-weight:800;color:var(--gold2);letter-spacing:1px}
+.pdf-item{
+  padding:10px 14px;display:flex;align-items:center;gap:8px;
+  cursor:pointer;transition:background 0.2s;border-bottom:1px solid rgba(201,148,42,0.08);
+}
+.pdf-item:last-child{border-bottom:none}
+.pdf-item:hover{background:rgba(201,148,42,0.1)}
+.pdf-item-name{font-family:var(--font-ui);font-size:11px;font-weight:700;color:rgba(253,246,227,0.8);flex:1}
+.pdf-item-icon{font-size:16px}
+.pdf-download-btn{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  padding:3px 8px;border-radius:6px;
+  background:rgba(201,148,42,0.2);border:1px solid rgba(201,148,42,0.3);
+  color:var(--gold2);cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.pdf-download-btn:hover{background:var(--gold);color:var(--ink)}
+
+/* ===== MAIN CONTENT ===== */
+.content{flex:1;overflow-y:auto;position:relative}
+
+/* ===== AUTH SCREEN ===== */
+.auth-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:linear-gradient(160deg,#1a2a1a 0%,#2c1810 50%,#1a2a40 100%);
+  min-height:100vh;
+}
+.auth-card{
+  background:var(--parchment);
+  border-radius:20px;padding:44px 40px;
+  max-width:460px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  border:2px solid var(--gold);
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.auth-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));
+}
+.auth-crescent{font-size:56px;display:block;margin-bottom:16px;animation:float 4s ease-in-out infinite}
+.auth-title{font-family:var(--font-title);font-size:28px;color:var(--ink);margin-bottom:4px;font-weight:700}
+.auth-subtitle{font-family:var(--font-ui);font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px;font-style:italic}
+.auth-arabic{font-size:22px;color:var(--gold);margin-bottom:24px;direction:rtl;font-family:serif}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--parchment2);border-radius:10px;padding:3px;border:1px solid var(--border)}
+.auth-tab{flex:1;padding:9px;border-radius:8px;border:none;background:transparent;font-family:var(--font-ui);font-size:13px;font-weight:800;cursor:pointer;color:var(--muted);transition:all 0.2s}
+.auth-tab.active{background:var(--ink);color:var(--gold2);box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.auth-field{margin-bottom:12px;text-align:left}
+.auth-label{font-family:var(--font-ui);font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:block}
+.auth-inp{
+  width:100%;padding:12px 14px;
+  border:2px solid var(--border);border-radius:10px;
+  font-family:var(--font-ui);font-size:14px;font-weight:700;
+  color:var(--ink);background:var(--white);outline:none;
+  transition:border-color 0.2s;
+}
+.auth-inp:focus{border-color:var(--gold)}
+.auth-btn{
+  width:100%;padding:14px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#2c1810,#4a3728);
+  color:var(--gold2);font-family:var(--font-ui);font-size:15px;font-weight:900;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(0,0,0,0.3);
+  margin-top:4px;letter-spacing:0.5px;
+}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.auth-err{color:#8b3a3a;font-size:12px;font-weight:700;margin-bottom:10px;padding:8px 12px;background:#fdf2f2;border-radius:8px;border:1px solid #e8b4b4;font-family:var(--font-ui)}
+.auth-type-row{display:flex;gap:10px;margin-bottom:16px}
+.auth-type-btn{
+  flex:1;padding:12px;border-radius:12px;
+  border:2px solid var(--border);background:var(--white);
+  font-family:var(--font-ui);font-size:12px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.auth-type-btn.active{border-color:var(--gold);background:#fef9e7;color:var(--ink)}
+
+/* ===== HOME / LIBRARY ===== */
+.home-hero{
+  background:linear-gradient(160deg,#1a2a1a 0%,#2c1810 50%,#1a2a40 100%);
+  padding:48px 40px 56px;position:relative;overflow:hidden;
+}
+.home-hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9942a' fill-opacity='0.05'%3E%3Cpath d='M40 0C17.9 0 0 17.9 0 40s17.9 40 40 40 40-17.9 40-40S62.1 0 40 0zm0 70C23.4 70 10 56.6 10 40S23.4 10 40 10s30 13.4 30 30-13.4 30-30 30z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.home-hero-inner{position:relative;max-width:700px}
+.home-bismillah{font-size:28px;color:var(--gold2);margin-bottom:12px;direction:rtl;font-family:serif;display:block}
+.home-title{font-family:var(--font-title);font-size:42px;color:var(--parchment);font-weight:700;line-height:1.1;margin-bottom:8px}
+.home-title-gold{color:var(--gold2)}
+.home-subtitle{font-family:var(--font-body);font-size:16px;color:rgba(253,246,227,0.75);font-style:italic;margin-bottom:20px}
+.home-stats{display:flex;gap:20px;flex-wrap:wrap}
+.home-stat{
+  background:rgba(201,148,42,0.15);border:1px solid rgba(201,148,42,0.3);
+  border-radius:10px;padding:10px 18px;
+  font-family:var(--font-ui);
+}
+.home-stat-num{font-size:22px;font-weight:900;color:var(--gold2)}
+.home-stat-label{font-size:10px;color:rgba(253,246,227,0.6);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+
+/* Category tabs */
+.category-tabs{
+  display:flex;gap:8px;padding:24px 32px 0;
+  overflow-x:auto;flex-wrap:nowrap;
+  border-bottom:2px solid var(--border);
+  background:var(--parchment);
+}
+.category-tabs::-webkit-scrollbar{height:0}
+.cat-tab{
+  padding:10px 20px;border-radius:10px 10px 0 0;
+  border:2px solid transparent;border-bottom:none;
+  font-family:var(--font-ui);font-size:13px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;color:var(--muted);
+  background:transparent;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:-2px;
+}
+.cat-tab:hover{color:var(--ink);background:var(--parchment2)}
+.cat-tab.active{
+  color:var(--ink);background:var(--parchment);
+  border-color:var(--border);border-bottom-color:var(--parchment);
+}
+
+/* Book grid */
+.books-grid-wrap{padding:28px 32px}
+.books-grid-title{
+  font-family:var(--font-title);font-size:18px;color:var(--ink2);
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+}
+.books-grid-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.books-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:20px;
+}
+.book-card{
+  background:var(--white);border-radius:14px;
+  border:1px solid var(--border);
+  cursor:pointer;transition:all 0.25s;
+  overflow:hidden;position:relative;
+  box-shadow:0 2px 12px var(--shadow);
+}
+.book-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(44,24,16,0.25);border-color:var(--gold)}
+.book-cover{
+  height:160px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.book-cover-emoji{font-size:64px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2))}
+.book-cover-pattern{
+  position:absolute;inset:0;opacity:0.15;
+  background-size:30px 30px;
+}
+.book-card-body{padding:14px}
+.book-card-category{
+  font-family:var(--font-ui);font-size:9px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;
+}
+.book-card-title{font-family:var(--font-body);font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:6px}
+.book-card-desc{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600;line-height:1.5;margin-bottom:10px}
+.book-card-footer{display:flex;align-items:center;justify-content:space-between}
+.book-card-chapters{font-family:var(--font-ui);font-size:10px;color:var(--muted);font-weight:700}
+.book-card-progress{
+  height:4px;background:var(--parchment2);border-radius:2px;margin-top:8px;
+}
+.book-card-progress-fill{height:100%;border-radius:2px;background:var(--gold);transition:width 0.5s ease}
+.book-card-badge{
+  position:absolute;top:10px;right:10px;
+  font-family:var(--font-ui);font-size:9px;font-weight:800;
+  padding:3px 8px;border-radius:8px;letter-spacing:1px;
+}
+.book-card-badge.new{background:var(--teal);color:#fff}
+.book-card-badge.done{background:var(--gold);color:var(--ink)}
+
+/* ===== BOOK READER ===== */
+.reader-wrap{max-width:860px;margin:0 auto;padding:32px 32px 60px}
+.reader-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-ui);font-size:13px;font-weight:700;
+  color:var(--muted);cursor:pointer;transition:color 0.2s;
+  margin-bottom:24px;padding:6px 0;
+}
+.reader-back:hover{color:var(--gold)}
+.reader-header{margin-bottom:32px}
+.reader-category{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;
+}
+.reader-title{font-family:var(--font-title);font-size:34px;color:var(--ink);font-weight:700;line-height:1.2;margin-bottom:10px}
+.reader-meta{font-family:var(--font-ui);font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.reader-divider{height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:20px 0;border:none}
+
+/* Chapter list */
+.chapter-list{
+  background:var(--white);border-radius:14px;
+  border:1px solid var(--border);overflow:hidden;
+  margin-bottom:32px;box-shadow:0 2px 12px var(--shadow);
+}
+.chapter-list-header{
+  padding:16px 20px;
+  background:linear-gradient(135deg,#2c1810,#1a2a2a);
+  display:flex;align-items:center;gap:10px;
+}
+.chapter-list-title{font-family:var(--font-title);font-size:14px;color:var(--gold2);font-weight:600;letter-spacing:1px}
+.chapter-item{
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid var(--parchment2);cursor:pointer;
+  transition:all 0.2s;
+}
+.chapter-item:last-child{border-bottom:none}
+.chapter-item:hover{background:var(--parchment);padding-left:28px}
+.chapter-item.active{background:#fef9e7;border-left:3px solid var(--gold)}
+.chapter-item.done{opacity:0.8}
+.chapter-num{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);font-size:13px;font-weight:800;
+  flex-shrink:0;
+}
+.chapter-num.default{background:var(--parchment2);color:var(--ink2)}
+.chapter-num.done{background:var(--gold);color:var(--ink)}
+.chapter-num.active{background:var(--ink);color:var(--gold2)}
+.chapter-info{flex:1}
+.chapter-name{font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.chapter-sub{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600}
+.chapter-status{font-size:18px;flex-shrink:0}
+
+/* Story content */
+.story-content{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);
+  box-shadow:0 4px 24px var(--shadow);
+  overflow:hidden;margin-bottom:28px;
+}
+.story-scene{
+  background:linear-gradient(160deg,#1a2a1a,#2c1810,#1a2a40);
+  min-height:220px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:32px;
+}
+.story-scene-emoji{font-size:80px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4));z-index:1;position:relative}
+.story-scene-caption{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,0.6));
+  padding:16px 20px 12px;
+  font-family:var(--font-ui);font-size:11px;color:rgba(255,255,255,0.7);
+  font-style:italic;font-weight:600;text-align:center;
+}
+.story-chapter-header{
+  padding:20px 28px 0;
+  border-bottom:1px solid var(--parchment2);
+}
+.story-chapter-num{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;
+}
+.story-chapter-title{font-family:var(--font-title);font-size:22px;color:var(--ink);font-weight:600;padding-bottom:16px}
+.story-body{padding:28px;font-size:16px;line-height:1.9;color:var(--ink2)}
+.story-body p{margin-bottom:18px}
+.story-body p:last-child{margin-bottom:0}
+.story-pull-quote{
+  border-left:4px solid var(--gold);
+  padding:14px 20px;margin:20px 0;
+  background:linear-gradient(90deg,#fef9e7,transparent);
+  border-radius:0 8px 8px 0;
+  font-style:italic;font-size:17px;color:var(--ink);font-weight:600;
+}
+.story-highlight{
+  display:inline;background:linear-gradient(120deg,rgba(201,148,42,0.2) 0%,rgba(201,148,42,0.15) 100%);
+  border-radius:3px;padding:1px 3px;
+}
+
+/* Lesson & Moral box */
+.lesson-box{
+  margin:0 28px 28px;padding:24px;
+  background:linear-gradient(135deg,#1a2a1a,#2c1810);
+  border-radius:14px;position:relative;overflow:hidden;
+}
+.lesson-box::before{
+  content:'✨';position:absolute;top:16px;right:16px;font-size:24px;opacity:0.3;
+}
+.lesson-box-title{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;
+}
+.lesson-item{
+  display:flex;gap:10px;margin-bottom:8px;
+  font-family:var(--font-ui);font-size:13px;color:rgba(253,246,227,0.9);font-weight:600;
+}
+.lesson-item::before{content:'📖';font-size:14px;flex-shrink:0;margin-top:1px}
+.moral-box{
+  margin:0 28px 28px;padding:20px 24px;
+  background:linear-gradient(135deg,#fef9e7,#fdf0d0);
+  border:2px solid var(--gold);border-radius:14px;
+  text-align:center;
+}
+.moral-box-title{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;
+}
+.moral-text{font-family:var(--font-body);font-size:17px;font-style:italic;color:var(--ink);font-weight:600;line-height:1.5}
+
+/* Story navigation */
+.story-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 28px;
+  border-top:1px solid var(--parchment2);
+}
+.story-nav-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:10px;
+  border:2px solid var(--border);background:var(--white);
+  font-family:var(--font-ui);font-size:13px;font-weight:800;
+  color:var(--ink);cursor:pointer;transition:all 0.2s;
+}
+.story-nav-btn:hover{border-color:var(--gold);background:var(--parchment)}
+.story-nav-btn.primary{background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+.story-nav-btn.primary:hover{background:#4a3728}
+.story-nav-btn:disabled{opacity:0.4;cursor:not-allowed}
+.story-progress-dots{display:flex;gap:6px;align-items:center}
+.progress-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--border);
+  transition:all 0.3s;cursor:pointer;
+}
+.progress-dot.done{background:var(--gold)}
+.progress-dot.current{background:var(--ink);width:20px;border-radius:4px}
+
+/* ===== QUIZ ===== */
+.quiz-wrap{padding:28px;animation:fadeUp 0.4s ease}
+.quiz-header{
+  background:linear-gradient(135deg,#1a2a1a,#2c1810);
+  border-radius:14px;padding:20px 24px;margin-bottom:24px;
+  display:flex;align-items:center;gap:14px;
+}
+.quiz-icon{font-size:32px}
+.quiz-header-text{flex:1}
+.quiz-header-title{font-family:var(--font-title);font-size:18px;color:var(--gold2);font-weight:600;margin-bottom:3px}
+.quiz-header-sub{font-family:var(--font-ui);font-size:12px;color:rgba(253,246,227,0.6);font-weight:600}
+.quiz-progress-bar{height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin-top:10px}
+.quiz-progress-fill{height:100%;border-radius:2px;background:var(--gold);transition:width 0.4s ease}
+.quiz-question-card{
+  background:var(--white);border-radius:14px;
+  border:1px solid var(--border);padding:28px;
+  margin-bottom:16px;box-shadow:0 2px 12px var(--shadow);
+}
+.quiz-q-num{
+  font-family:var(--font-ui);font-size:10px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;
+}
+.quiz-q-text{font-family:var(--font-body);font-size:18px;font-weight:700;color:var(--ink);line-height:1.5;margin-bottom:20px}
+.quiz-options{display:flex;flex-direction:column;gap:10px}
+.quiz-option{
+  padding:14px 18px;border-radius:10px;
+  border:2px solid var(--border);background:var(--white);
+  font-family:var(--font-ui);font-size:14px;font-weight:700;
+  color:var(--ink);cursor:pointer;transition:all 0.2s;
+  text-align:left;display:flex;align-items:center;gap:12px;
+}
+.quiz-option:hover:not(:disabled){border-color:var(--gold);background:var(--parchment)}
+.quiz-option.correct{border-color:var(--green);background:#f0fdf4;color:var(--green)}
+.quiz-option.wrong{border-color:var(--rose);background:#fdf2f2;color:var(--rose)}
+.quiz-option.selected:not(.correct):not(.wrong){border-color:var(--blue);background:#eff6ff;color:var(--blue)}
+.quiz-option:disabled{cursor:not-allowed}
+.quiz-option-letter{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;flex-shrink:0;
+  background:var(--parchment2);
+}
+.quiz-feedback{
+  padding:14px 18px;border-radius:10px;
+  font-family:var(--font-ui);font-size:13px;font-weight:700;
+  margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;
+}
+.quiz-feedback.correct{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.quiz-feedback.wrong{background:#fdf2f2;border:1px solid #fca5a5;color:#991b1b}
+.quiz-next-btn{
+  width:100%;padding:14px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#2c1810,#4a3728);
+  color:var(--gold2);font-family:var(--font-ui);font-size:15px;font-weight:900;
+  cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.2);
+}
+.quiz-next-btn:hover{transform:translateY(-2px)}
+
+/* Quiz results */
+.quiz-results{padding:28px;text-align:center;animation:fadeUp 0.5s ease}
+.quiz-results-icon{font-size:72px;margin-bottom:16px;animation:starPop 0.6s ease}
+.quiz-results-title{font-family:var(--font-title);font-size:28px;color:var(--ink);margin-bottom:8px;font-weight:700}
+.quiz-results-score{
+  font-family:var(--font-ui);font-size:48px;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:8px;
+}
+.quiz-results-sub{font-family:var(--font-ui);font-size:14px;color:var(--muted);font-weight:600;margin-bottom:28px}
+.quiz-results-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.results-btn{
+  padding:12px 24px;border-radius:12px;
+  font-family:var(--font-ui);font-size:14px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;border:none;
+}
+.results-btn.primary{background:var(--ink);color:var(--gold2);box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.results-btn.secondary{background:var(--parchment2);color:var(--ink);border:2px solid var(--border)}
+.results-btn:hover{transform:translateY(-2px)}
+
+/* ===== BADGES ===== */
+.badges-wrap{padding:28px 32px}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.badge-card{
+  background:var(--white);border-radius:14px;padding:20px 14px;
+  text-align:center;border:2px solid var(--border);
+  transition:all 0.2s;cursor:default;
+}
+.badge-card.earned{border-color:var(--gold);background:linear-gradient(135deg,#fef9e7,#fff)}
+.badge-card:hover.earned{transform:translateY(-4px);box-shadow:0 8px 24px rgba(201,148,42,0.2)}
+.badge-card.locked{opacity:0.5;filter:grayscale(0.6)}
+.badge-icon{font-size:40px;margin-bottom:10px;display:block}
+.badge-name{font-family:var(--font-ui);font-size:12px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.badge-desc{font-family:var(--font-ui);font-size:10px;color:var(--muted);font-weight:600;line-height:1.4}
+
+/* ===== PARENT HUB ===== */
+.parent-wrap{padding:28px 32px}
+.parent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:28px}
+.parent-card{
+  background:var(--white);border-radius:14px;padding:20px;
+  border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);
+}
+.parent-card-label{font-family:var(--font-ui);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.parent-card-value{font-family:var(--font-title);font-size:28px;color:var(--ink);font-weight:700}
+.parent-card-sub{font-family:var(--font-ui);font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+
+/* ===== LOADING ===== */
+.loading-wrap{display:flex;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:12px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--muted);font-style:italic}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--ink);color:var(--gold2);
+  padding:12px 20px;border-radius:12px;
+  font-family:var(--font-ui);font-size:13px;font-weight:700;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  animation:fadeUp 0.3s ease;z-index:999;
+  display:flex;align-items:center;gap:8px;
+  max-width:300px;
+}
+
+/* Responsive */
+@media(max-width:700px){
+  .sidebar{width:200px}
+  .home-hero{padding:28px 20px 36px}
+  .home-title{font-size:28px}
+  .books-grid-wrap,.reader-wrap,.badges-wrap,.parent-wrap{padding:16px}
+  .books-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── Supabase ────────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://ifayrtuouxlfnvtyhnjz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmYXlydHVvdXhsZm52dHlobmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0NDA0NTYsImV4cCI6MjAyMzAxNjQ1Nn0.PLACEHOLDER';
+const sb = { url: SUPABASE_URL, key: SUPABASE_KEY };
+async function sbFetch(path, opts={}) {
+  const r = await fetch(sb.url + path, {
+    ...opts,
+    headers: { 'apikey': sb.key, 'Authorization': 'Bearer ' + sb.key, 'Content-Type': 'application/json', 'Prefer': 'return=representation', ...(opts.headers||{}) }
+  });
+  const data = await r.json();
+  return { data, error: r.ok ? null : data };
+}
+
+// ─── API Call ─────────────────────────────────────────────────────────────────
+const API_KEY_STORE = 'qisas_api_key';
+async function callClaude(apiKey, messages, systemPrompt='', maxTokens=1200) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, system: systemPrompt, messages })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.content[0].text;
+}
+
+// ─── Book Data ────────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  { id: 'all', label: '📚 All Stories', color: '#2c1810' },
+  { id: 'prophets', label: '🌟 Prophets', color: '#1a4a7a' },
+  { id: 'companions', label: '⚔️ Companions', color: '#4a3728' },
+  { id: 'ahmadiyyat', label: '🕌 Ahmadiyyat', color: '#1a6b6b' },
+  { id: 'values', label: '💎 Values & Faith', color: '#2d6a4f' },
+];
+
+const BOOKS = [
+  {
+    id: 'stories-early-islam',
+    title: 'Stories from Early Islam',
+    category: 'companions',
+    categoryLabel: 'Prophet ﷺ & Companions',
+    emoji: '⚔️',
+    coverColor: 'linear-gradient(135deg,#1a4a7a,#2c1810)',
+    desc: 'True stories of the Holy Prophet ﷺ and his companions — how faith helped them overcome all hardship.',
+    source: 'alislam.org',
+    isNew: true,
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: 'The Night of the Hijra',
+        scene: '🌙', sceneCaption: 'The Prophet ﷺ and Abu Bakr leave Mecca in the dark of night',
+        content: [
+          "It was a moonless night in Mecca, in the year 622 CE. The leaders of Quraysh had made a terrible plan — they would send one young man from every tribe to kill the Prophet Muhammad, peace and blessings be upon him, all at once. This way, no single tribe could be blamed.",
+          "But Allah, the All-Knowing, revealed the plan to His Prophet. He told him to leave Mecca that very night and travel to Medina. The Prophet asked his trusted friend Abu Bakr (may Allah be pleased with him) to accompany him on this dangerous journey.",
+          "While the enemies surrounded his house, the Prophet asked his cousin Ali (may Allah be pleased with him) to sleep in his bed so the enemies would think he was still inside. Then, in the darkest part of the night, the Prophet and Abu Bakr slipped away quietly.",
+          "They hid in a cave called Thawr for three days. The Quraysh searched everywhere. When they reached the very mouth of the cave, Abu Bakr trembled with worry — not for himself, but for the Prophet. The Prophet placed his hand on Abu Bakr's shoulder and said, <span class='story-highlight'>\"Do not grieve, surely Allah is with us.\"</span>",
+          "A spider had spun its web across the cave entrance, and birds had made their nest at the opening. When the searchers saw this, they said, \"No one could have entered here recently\" — and walked away. It was a miracle of Allah's protection.",
+          "After three days, they continued south and then north to Medina. The people of Medina had been waiting eagerly. When the news spread that the Prophet had arrived, men, women, and children poured out of their homes with joy. The Hijra — the Migration — had succeeded."
+        ],
+        learned: ['True friends stand by us in the most dangerous times, just as Abu Bakr stood with the Prophet.', 'When we trust in Allah completely, He provides protection in ways we never expect.', 'Sacrifice for others, like Ali sleeping in the Prophet\'s place, is a sign of great faith.'],
+        moral: 'When Allah is with you, no enemy can harm you — trust in Him and be brave.'
+      },
+      {
+        id: 'ch2', num: 2, title: 'Bilal and the Blazing Sun',
+        scene: '☀️', sceneCaption: 'Bilal RA endures his trial with patience and faith',
+        content: [
+          "Before Islam spread its light across Arabia, Bilal ibn Rabah was an enslaved man from Abyssinia. He had no power, no wealth, and no tribe to protect him. But he had something more valuable than all of these — a heart that recognized the truth of Islam.",
+          "When Bilal accepted the message of the Prophet Muhammad ﷺ, his cruel master Umayyah ibn Khalaf was furious. He would take Bilal out to the burning desert sands of Mecca during the hottest part of the day. He would make him lie on his back on the scorching ground and place a massive boulder on his chest.",
+          "\"Deny Muhammad!\" Umayyah would shout. \"Return to the old gods!\" But Bilal's answer never changed. Through cracked lips and a parched throat, he would say one word again and again: <span class='story-highlight'>\"Ahad! Ahad!\"</span> — meaning, \"One! One!\" — declaring that Allah alone is One.",
+          "The companions of the Prophet ﷺ could hear Bilal's cries from afar. Abu Bakr, one of the wealthiest men in Mecca, could not bear to watch. He went to Umayyah and purchased Bilal's freedom, paying a great sum of money.",
+          "When Bilal was free, the Prophet ﷺ honoured him greatly. He chose Bilal to be the very first mu'adhdhin — the caller to prayer — for the Muslim community. When Islam conquered Mecca, it was Bilal who climbed to the top of the Ka'bah and called the prayer from its roof.",
+          "The man who had been pressed under a boulder was now standing at the highest point in the holiest city, his powerful voice ringing out for all to hear. Allah had not forgotten Bilal — and He never forgets those who are patient for His sake."
+        ],
+        learned: ['Patience in hardship, for the sake of Allah, always leads to honour.', 'True wealth is used to help others — Abu Bakr used his money to free an oppressed person.', 'Allah can raise the lowly to the highest places when they remain faithful.'],
+        moral: 'Stay firm in what is right, no matter how difficult it becomes — honour comes to those who are patient.'
+      },
+      {
+        id: 'ch3', num: 3, title: 'The Kindness of the Prophet ﷺ',
+        scene: '🌿', sceneCaption: 'The Prophet ﷺ cared for all — even those who hurt him',
+        content: [
+          "There was an old woman in Mecca who hated the Prophet Muhammad ﷺ deeply. Every single day, when the Prophet would walk down a certain street, she would lean out of her window and throw rubbish on his head.",
+          "Day after day, the Prophet ﷺ would continue walking — calmly, patiently, without a word of anger. He never shouted up at her window. He never avoided that street. He never complained about her to anyone.",
+          "Then one day, as the Prophet walked past, there was no rubbish. He looked up — the window was empty. He stopped and thought about this. Where was the woman? Was she unwell?",
+          "The Prophet ﷺ knocked on her door and asked about her. He was told that she was sick and had been confined to her bed for several days. Without hesitation, the Prophet asked if he could visit her.",
+          "He went into her home and sat by her bedside. He asked how she was feeling, spoke gently to her, and made du'a for her recovery. The woman was completely astonished. She had treated him so badly — and here he was, showing her kindness.",
+          "His example touched her heart. She saw in that moment what kind of man he truly was — and she accepted Islam. <span class='story-highlight'>The Prophet never returned cruelty with cruelty. He returned it with compassion.</span>"
+        ],
+        learned: ['Returning anger with kindness is one of the greatest strengths a person can have.', 'The Prophet ﷺ showed us that good character can change hearts.', 'Checking on people who are unwell, even those who have wronged us, is the mark of a great person.'],
+        moral: 'The greatest weapon against hatred is kindness — meet harshness with gentleness and watch hearts change.'
+      }
+    ],
+    quizQuestions: [
+      { q: 'Why did the Quraysh want to send men from every tribe to harm the Prophet?', options: ['So all tribes would share the blame', 'Because he was sleeping', 'To test their bravery', 'Because they liked working together'], answer: 0, explain: 'By involving every tribe, no single one could be held responsible.' },
+      { q: 'What did Bilal say while being tortured in the desert sun?', options: ['Help me!', 'Ahad! Ahad!', 'La ilaha', 'Please stop'], answer: 1, explain: 'Bilal repeatedly said "Ahad! Ahad!" meaning "One! One!" — declaring Allah\'s oneness.' },
+      { q: 'Who purchased Bilal\'s freedom?', options: ['Umar ibn al-Khattab', 'Ali ibn Abi Talib', 'Abu Bakr al-Siddiq', 'Uthman ibn Affan'], answer: 2, explain: 'Abu Bakr paid a large sum to free Bilal from his cruel master.' },
+      { q: 'What did the old woman who threw rubbish learn from the Prophet\'s visit?', options: ['That he was afraid of her', 'That kindness is more powerful than cruelty', 'That he wanted revenge', 'That she should move houses'], answer: 1, explain: 'His compassion touched her heart and she accepted Islam.' },
+      { q: 'What is the Hijra?', options: ['A type of prayer', 'The migration from Mecca to Medina', 'The Battle of Badr', 'A cave near Mecca'], answer: 1, explain: 'The Hijra is the Prophet\'s migration from Mecca to Medina in 622 CE.' }
+    ]
+  },
+  {
+    id: 'life-promised-messiah',
+    title: 'Life of the Promised Messiah (as)',
+    category: 'ahmadiyyat',
+    categoryLabel: 'The Promised Messiah',
+    emoji: '🕌',
+    coverColor: 'linear-gradient(135deg,#1a6b6b,#2c1810)',
+    desc: 'The inspiring life of Hazrat Mirza Ghulam Ahmad (as) — from a humble boy in Qadian to the Promised Messiah.',
+    source: 'alislam.org',
+    isNew: true,
+    useRealPhoto: true,
+    photoDesc: 'Hazrat Mirza Ghulam Ahmad (as), the Promised Messiah',
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: 'A Boy Who Loved to Pray',
+        scene: '🌅', sceneCaption: 'The young Ahmad spent his mornings in quiet worship in Qadian',
+        content: [
+          "In a small town called Qadian, in the Punjab region of India, a boy was born in 1835 into the noble family of Mirza Ghulam Murtaza. His name was Mirza Ghulam Ahmad. From his very earliest years, those who knew him could see that he was different from other children.",
+          "While other children played in the streets, young Ahmad preferred quieter things. He loved to sit alone and think deeply. He loved to read — especially books about religion and truth. Most of all, he loved to pray. Even as a small child, he had a strong desire to be close to Allah.",
+          "Once, when he was very young, he was playing with his cousin. He turned to her and said something she would never forget: <span class='story-highlight'>\"Pray for me that Allah grants me the ability to offer Salat.\"</span> This shows us that even the ability to pray, he believed, was a gift from Allah — something to be asked for, not taken for granted.",
+          "His mother was a deeply religious woman who prayed for her children constantly. His father, though sometimes strict, taught him discipline. The young Ahmad absorbed all of this — the prayers of his mother, the discipline of his father, and the deep quiet of his own heart.",
+          "He spent his youth mostly in Qadian, studying religious texts, learning Arabic and Persian, and deepening his connection with God through long hours of prayer and reflection. Friends and family noticed that he rarely wasted time on idle talk. He was serious, thoughtful, and gentle."
+        ],
+        learned: ['Even the desire to pray is something we should ask Allah for — it is His gift to us.', 'Spending time in reading and reflection builds wisdom and closeness to God.', 'A righteous mother\'s prayers have a powerful effect on her children.'],
+        moral: 'The foundation of a great life is built in quiet moments of prayer and reflection, not in noise and distraction.'
+      },
+      {
+        id: 'ch2', num: 2, title: 'The Defence of Islam',
+        scene: '📖', sceneCaption: 'Hazrat Ahmad wrote tirelessly in defence of Islam',
+        content: [
+          "When Hazrat Mirza Ghulam Ahmad (as) was a young man, he saw something that troubled him deeply. Islam was being attacked on all sides. Christian missionaries were coming to India and telling Muslims that their faith was wrong. Arya Samaj Hindus were mocking Islam. And some Muslims themselves had drifted away from the true spirit of their faith.",
+          "Hazrat Ahmad felt a burning desire to defend Islam — not with swords, but with the pen. He began to write. And once he began, he could not stop. Over his lifetime, he wrote more than 80 books in Arabic, Urdu, and Persian.",
+          "His greatest work was a massive book called <span class='story-highlight'>Barahin-e-Ahmadiyya</span> — \"The Arguments of Ahmadiyya.\" It was a powerful defence of Islam, full of logical arguments, Quranic verses, and spiritual insights. When it began to be published, scholars across the Muslim world took notice.",
+          "People who had never met him began to write to him. Questions poured in from across India. Debates were organised. And always, whether speaking or writing, Hazrat Ahmad showed remarkable calm, intelligence, and deep knowledge.",
+          "He did not fight rudely. He did not insult those who disagreed with him. He presented his arguments clearly, with evidence, and with the confident peace of a man who knew the truth was on his side. He was a warrior of the pen — and his weapon was wisdom."
+        ],
+        learned: ['The best way to defend truth is through knowledge, reason, and calmness — not anger.', 'A single pen, used wisely, can reach more hearts than a thousand swords.', 'Allah gives special abilities to those who dedicate themselves to His service.'],
+        moral: 'Stand up for the truth with knowledge and wisdom — the power of a good argument outlasts any weapon.'
+      }
+    ],
+    quizQuestions: [
+      { q: 'In which town was Hazrat Mirza Ghulam Ahmad (as) born?', options: ['Lahore', 'Qadian', 'Delhi', 'Amritsar'], answer: 1, explain: 'He was born in Qadian, Punjab, India in 1835.' },
+      { q: 'What did the young Ahmad ask his cousin to pray for?', options: ['Wealth', 'Long life', 'The ability to offer Salat', 'Good health'], answer: 2, explain: 'He believed even the ability to pray was a gift from Allah to be asked for.' },
+      { q: 'What is the name of Hazrat Ahmad\'s most famous book defending Islam?', options: ['Kitab-ul-Bariyya', 'Barahin-e-Ahmadiyya', 'Tadhkirah', 'Haqiqat-ul-Wahy'], answer: 1, explain: 'Barahin-e-Ahmadiyya was his great defence of Islam using logical and Quranic arguments.' },
+      { q: 'How many books did Hazrat Ahmad write in his lifetime?', options: ['More than 80', 'Exactly 10', 'About 30', 'Less than 5'], answer: 0, explain: 'He wrote more than 80 books in Arabic, Urdu, and Persian.' }
+    ]
+  },
+  {
+    id: 'stories-early-ahmadiyyat',
+    title: 'Stories from Early Ahmadiyyat',
+    category: 'ahmadiyyat',
+    categoryLabel: 'Early Ahmadiyyat',
+    emoji: '🌙',
+    coverColor: 'linear-gradient(135deg,#2d6a4f,#1a2a40)',
+    desc: 'How the Ahmadiyya Muslim Community began — true stories of faith, sacrifice, and remarkable miracles.',
+    source: 'alislam.org',
+    isNew: true,
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: 'The First Pledge',
+        scene: '🤝', sceneCaption: 'Forty men gathered to take the first Bai\'at',
+        content: [
+          "It was the 23rd of March, 1889. In a small house in Ludhiana, India, something extraordinary was about to happen. Hazrat Mirza Ghulam Ahmad (as) had announced that he would accept a pledge of allegiance — a Bai'at — from those who believed in his divine mission.",
+          "Forty men had gathered. They came from different places, different backgrounds, different walks of life. But they shared one thing: their hearts had been moved by the writings and the spiritual presence of Hazrat Ahmad (as).",
+          "One by one, they placed their hands in the hand of the Promised Messiah (as) and made a solemn promise. They promised to prioritise their faith over all worldly things. They promised to avoid all sins. They promised to be truthful, to pray regularly, and to remain loyal to Allah and His Messenger.",
+          "The very first person to take this pledge was Hazrat Maulvi Noor-ud-Din (ra) — a learned doctor and scholar who would later become the first Khalifa of the Ahmadiyya Muslim Community. <span class='story-highlight'>He once said: \"If Ahmad (as) were to tell me that the Himalayas were coming toward us, I would believe him — because he speaks only the truth.\"</span>",
+          "From those forty people, the Ahmadiyya Muslim Community was born. Today, it has grown to tens of millions of members in over 200 countries. That small gathering in Ludhiana was the seed of something that would spread across the entire world."
+        ],
+        learned: ['Great movements begin with a small group of sincere, committed people.', 'Faith means trusting completely in what you know to be true.', 'A promise made to Allah should be kept with your whole heart.'],
+        moral: 'Never underestimate the power of sincerity — forty faithful hearts planted a tree that now shades the whole world.'
+      }
+    ],
+    quizQuestions: [
+      { q: 'In which city did the first Bai\'at take place?', options: ['Qadian', 'Lahore', 'Ludhiana', 'Delhi'], answer: 2, explain: 'The first Bai\'at took place in Ludhiana on 23rd March 1889.' },
+      { q: 'How many people took the first Bai\'at?', options: ['10', '40', '100', '7'], answer: 1, explain: 'Forty men gathered to take the first pledge.' },
+      { q: 'Who was the first person to take the Bai\'at?', options: ['Hazrat Mirza Bashiruddin Mahmud Ahmad', 'Hazrat Maulvi Noor-ud-Din', 'Hazrat Ali', 'Hazrat Abu Bakr'], answer: 1, explain: 'Hazrat Maulvi Noor-ud-Din (ra) was the first to pledge, who later became the first Khalifa.' }
+    ]
+  },
+  {
+    id: 'holy-prophet-kindness',
+    title: "The Holy Prophet's Kindness to Children",
+    category: 'prophets',
+    categoryLabel: 'The Holy Prophet ﷺ',
+    emoji: '💚',
+    coverColor: 'linear-gradient(135deg,#2d6a4f,#1a4a7a)',
+    desc: 'Beautiful true stories of how the Prophet Muhammad ﷺ loved and honoured children — and how we should treat them.',
+    source: 'alislam.org',
+    isNew: false,
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: "Children Were His Joy",
+        scene: '🌸', sceneCaption: 'The Prophet ﷺ always made time for children',
+        content: [
+          "The Prophet Muhammad, peace and blessings be upon him, was one of the greatest leaders the world has ever known. Empires trembled at his message, great scholars bowed their heads in respect, and kings sought his guidance. Yet with children, he was as gentle as a warm breeze.",
+          "Wherever the Prophet ﷺ went, children would run toward him. He never pushed them away. He never said, \"I am too busy\" or \"Go away, I have important things to do.\" Instead, he would stop, smile, and give them his full attention.",
+          "He used to joke and play with children. He would sometimes race with young Anas ibn Malik (ra), who served him for ten years. He called children by warm nicknames — Anas he called \"O little one!\" with great affection.",
+          "Once, a small child came to give the Prophet a gift of some dates. The Prophet accepted the gift with both hands, smiled warmly, and ate one of the dates right away — honouring the child's offering. <span class='story-highlight'>He taught us that even a small gift given with love should be received with joy.</span>",
+          "The Prophet ﷺ said: \"He is not of us who does not show mercy to our young.\" This was not just a saying — it was how he lived every single day. Children felt safe with him. They felt loved. And that love made them grow up to be some of the greatest Muslims in history."
+        ],
+        learned: ['Children deserve our full attention and kindness — never dismiss them as unimportant.', 'Accepting a gift with joy, no matter how small, honours the person who gave it.', 'How we treat children shapes who they become — love them well.'],
+        moral: "A person's true greatness is shown by how they treat those who are small and powerless — the Prophet showed us this perfectly."
+      }
+    ],
+    quizQuestions: [
+      { q: 'What did the Prophet ﷺ say about those who don\'t show mercy to the young?', options: ['"They are forgiven"', '"He is not of us"', '"They must try harder"', '"Give them time"'], answer: 1, explain: 'The Prophet said "He is not of us who does not show mercy to our young."' },
+      { q: 'What nickname did the Prophet ﷺ call Anas ibn Malik?', options: ['"Little star"', '"O little one"', '"Dear child"', '"Brave boy"'], answer: 1, explain: 'He affectionately called Anas "O little one" showing his warm relationship with children.' }
+    ]
+  },
+  {
+    id: 'primer-religious-knowledge',
+    title: 'A Primer of Religious Knowledge',
+    category: 'values',
+    categoryLabel: 'Faith & Values',
+    emoji: '📿',
+    coverColor: 'linear-gradient(135deg,#4a3728,#1a6b6b)',
+    desc: 'The essential basics of Islamic faith explained simply and beautifully for young hearts and minds.',
+    source: 'alislam.org',
+    isNew: false,
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: 'Who Is Allah?',
+        scene: '✨', sceneCaption: 'All of creation points to its Creator',
+        content: [
+          "Look at the sky above you. See how perfectly the sun rises every morning and sets every evening — never missing a single day. Look at the stars that appear at night, each in its own exact place. Look at how seeds become trees, how eggs become birds, how tiny babies grow into adults. Who arranged all of this so perfectly?",
+          "The answer, which every honest heart can feel, is Allah — God, the Creator of all things. In Arabic, \"Allah\" means \"the One True God\" — the God who has no partners, no parents, no children, and no equals. He was never born and He will never die.",
+          "Allah has ninety-nine beautiful names in Islam. Each name describes one of His qualities. He is <span class='story-highlight'>Ar-Rahman</span> — the Most Merciful. He is <span class='story-highlight'>Al-'Aleem</span> — the All-Knowing. He is <span class='story-highlight'>Al-Wadood</span> — the Loving. Together, these names help us understand a little of who He is.",
+          "But how do we know Allah is real? The Promised Messiah (as) taught us that the best proof of Allah is not found in books alone — it is found in answered prayers. When you ask Allah for something sincerely, and He answers, that is a sign more powerful than any argument.",
+          "Muslims believe that Allah created us to worship Him — but not because He needs us. He doesn't. He created us because it is through worship, prayer, and goodness that we grow closer to Him, and in that closeness, we find peace, purpose, and true happiness."
+        ],
+        learned: ['Allah has no equal, no parent, and no partner — He is absolutely One.', 'His 99 names teach us different aspects of His perfect character.', 'The proof of Allah\'s existence includes the miracle of answered prayers.'],
+        moral: 'The whole universe is a letter written by Allah — if we read it carefully, we will find His signature everywhere.'
+      }
+    ],
+    quizQuestions: [
+      { q: 'What does the Arabic word "Allah" mean?', options: ['The Merciful', 'The One True God', 'The Creator', 'The Lord'], answer: 1, explain: 'Allah means "the One True God" — the God who has no partners or equals.' },
+      { q: 'How many beautiful names does Allah have?', options: ['10', '33', '99', '1000'], answer: 2, explain: 'Allah has 99 beautiful names, each describing one of His qualities.' },
+      { q: 'According to Islam, why did Allah create us?', options: ['To serve other humans', 'To worship Him and grow closer to Him', 'To rule the Earth', 'For no reason'], answer: 1, explain: 'Muslims believe Allah created us to worship Him — through which we find peace and purpose.' }
+    ]
+  },
+  {
+    id: 'islamic-rhymes',
+    title: 'My Book of Islamic Rhymes',
+    category: 'values',
+    categoryLabel: 'Values & Faith',
+    emoji: '🎶',
+    coverColor: 'linear-gradient(135deg,#8b3a3a,#1a2a40)',
+    desc: 'A delightful collection of short rhymes that teach Islamic values in a fun, memorable way.',
+    source: 'alislam.org',
+    isNew: false,
+    chapters: [
+      {
+        id: 'ch1', num: 1, title: 'Kindness, Truth & Honesty',
+        scene: '🌈', sceneCaption: 'Islamic values light our way through every day',
+        content: [
+          "Islam teaches us many beautiful things about how to live and treat others. Some of the most important values can be remembered through rhymes — short poems that stick in our hearts and remind us of what matters most.",
+          "The Holy Quran tells us: <span class='story-highlight'>\"Speak the truth, even if it be bitter.\"</span> Truth is the foundation of everything good. When we tell the truth, people trust us. When we lie, even once, that trust begins to crack like old pottery — and it takes a long time to repair.",
+          "The Prophet ﷺ was known as \"Al-Amin\" — the Trustworthy — even before he became a Prophet. The people of Mecca trusted him completely with their valuables and secrets. Even those who rejected his message never accused him of lying. That is how powerful a reputation for honesty can be.",
+          "Kindness is another pillar of our faith. Allah is Al-Latif — the Subtly Kind — and He loves kindness in all things. The Prophet ﷺ said that kindness adorns everything it touches. A kind word, a warm smile, helping someone carry something heavy — these small acts of kindness are beloved by Allah.",
+          "And honesty is not just about not lying — it is also about keeping our promises, returning things we borrow, and being fair in all our dealings. The Quran says those who are honest in small things will be honest in big things too."
+        ],
+        learned: ['Truth builds trust — it is the foundation of all good relationships.', 'Kindness adorns every situation it enters — it costs nothing but means everything.', 'Honesty includes keeping promises and being fair, not just avoiding lies.'],
+        moral: 'A truthful tongue and a kind heart are two of the greatest gifts Allah has given us — use them well.'
+      }
+    ],
+    quizQuestions: [
+      { q: 'What was the Prophet Muhammad\'s ﷺ nickname among the people of Mecca?', options: ['Al-Farooq', 'Al-Amin', 'As-Siddiq', 'Al-Ghani'], answer: 1, explain: 'He was called "Al-Amin" meaning "The Trustworthy" because of his perfect honesty.' },
+      { q: 'What does Al-Latif mean?', options: ['The Most Powerful', 'The All-Knowing', 'The Subtly Kind', 'The Patient'], answer: 2, explain: 'Al-Latif is one of Allah\'s names, meaning "the Subtly Kind."' }
+    ]
+  }
+];
+
+// ─── Badges ───────────────────────────────────────────────────────────────────
+const BADGES = [
+  { id: 'first-story', icon: '📖', name: 'First Story', desc: 'Read your first story', check: p => p.booksRead && p.booksRead.length >= 1 },
+  { id: 'chapter-champ', icon: '⭐', name: 'Chapter Champion', desc: 'Score 100% on a chapter quiz', check: p => p.perfectQuizzes && p.perfectQuizzes >= 1 },
+  { id: 'book-finisher', icon: '🏆', name: 'Book Finisher', desc: 'Complete all chapters of a book', check: p => p.booksCompleted && p.booksCompleted.length >= 1 },
+  { id: 'three-streak', icon: '🔥', name: '3-Day Streak', desc: 'Read 3 days in a row', check: p => p.streak && p.streak >= 3 },
+  { id: 'scholar', icon: '🌟', name: 'Scholar', desc: 'Complete 3 books', check: p => p.booksCompleted && p.booksCompleted.length >= 3 },
+  { id: 'noor-award', icon: '💎', name: 'Noor Award', desc: 'Complete the entire library', check: p => p.booksCompleted && p.booksCompleted.length >= BOOKS.length },
+  { id: 'truth-seeker', icon: '🔍', name: 'Truth Seeker', desc: 'Read 2 different categories', check: p => {
+    if (!p.booksRead) return false;
+    const cats = new Set(p.booksRead.map(id => BOOKS.find(b=>b.id===id)?.category).filter(Boolean));
+    return cats.size >= 2;
+  }},
+  { id: 'quiz-master', icon: '🎯', name: 'Quiz Master', desc: 'Complete 10 chapter quizzes', check: p => p.quizzesCompleted && p.quizzesCompleted >= 10 },
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getProfile(username) {
+  try { return JSON.parse(localStorage.getItem('qisas_' + username)) || {}; } catch { return {}; }
+}
+function saveProfile(username, data) {
+  localStorage.setItem('qisas_' + username, JSON.stringify(data));
+}
+function updateProfile(username, updates) {
+  const p = getProfile(username);
+  const np = { ...p, ...updates };
+  saveProfile(username, np);
+  return np;
+}
+
+function checkBadges(profile) {
+  const earned = profile.badges || [];
+  const newBadges = [];
+  for (const b of BADGES) {
+    if (!earned.includes(b.id) && b.check(profile)) {
+      earned.push(b.id);
+      newBadges.push(b);
+    }
+  }
+  return { earned, newBadges };
+}
+
+const CAT_COLORS = {
+  prophets: '#1a4a7a',
+  companions: '#4a3728',
+  ahmadiyyat: '#1a6b6b',
+  values: '#2d6a4f',
+  all: '#2c1810',
+};
+
+// ─── PDF Download (text-based with pictures emoji) ────────────────────────────
+function generatePDFContent(book) {
+  let text = `QISAS-UL-SALIHEEN\nStories of the Righteous\n`;
+  text += `${'─'.repeat(50)}\n\n`;
+  text += `${book.title.toUpperCase()}\n`;
+  text += `Category: ${book.categoryLabel}\n`;
+  text += `Source: ${book.source}\n\n`;
+  text += `${'─'.repeat(50)}\n\n`;
+  for (const ch of book.chapters) {
+    text += `Chapter ${ch.num}: ${ch.title}\n`;
+    text += `${ch.scene} ${ch.sceneCaption}\n`;
+    text += `${'─'.repeat(40)}\n\n`;
+    for (const para of ch.content) {
+      text += para.replace(/<[^>]+>/g, '') + '\n\n';
+    }
+    text += `\n🌟 What We Learned:\n`;
+    for (const l of ch.learned) { text += `  • ${l}\n`; }
+    text += `\n💎 Moral of the Story:\n  "${ch.moral}"\n`;
+    text += `\n${'═'.repeat(50)}\n\n`;
+  }
+  text += `\nDownloaded from Qisas-ul-Saliheen App\nStories of the Righteous for Young Muslims`;
+  return text;
+}
+
+function downloadBookPDF(book) {
+  const content = generatePDFContent(book);
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = book.title.replace(/[^a-z0-9]/gi, '_') + '.txt';
+  a.click();
+}
+
+// ─── Components ───────────────────────────────────────────────────────────────
+
+function Toast({ msg, onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, []);
+  return <div className="toast">✨ {msg}</div>;
+}
+
+function LoadingSpinner({ text = 'Loading...' }) {
+  return (
+    <div className="loading-wrap">
+      <div className="loading-spinner"/>
+      <div className="loading-text">{text}</div>
+    </div>
+  );
+}
+
+// ─── Quiz Component ───────────────────────────────────────────────────────────
+function Quiz({ questions, onComplete, title, isChapter }) {
+  const [cur, setCur] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const letters = ['A','B','C','D'];
+
+  function pick(i) {
+    if (answered) return;
+    setSelected(i);
+    setAnswered(true);
+    if (i === questions[cur].answer) setScore(s => s+1);
+  }
+  function next() {
+    if (cur < questions.length-1) { setCur(c=>c+1); setSelected(null); setAnswered(false); }
+    else setDone(true);
+  }
+  function finish() { onComplete(score, questions.length); }
+
+  if (done) {
+    const pct = Math.round((score/questions.length)*100);
+    const great = pct >= 80;
+    return (
+      <div className="quiz-results">
+        <div className="quiz-results-icon">{great ? '🌟' : '📖'}</div>
+        <div className="quiz-results-title">{great ? 'Wonderful!' : 'Good effort!'}</div>
+        <div className="quiz-results-score">{score}/{questions.length}</div>
+        <div className="quiz-results-sub">{pct}% — {great ? 'You really know this story!' : 'Keep reading to improve!'}</div>
+        <div className="quiz-results-btns">
+          <button className="results-btn primary" onClick={finish}>Continue Reading ›</button>
+          <button className="results-btn secondary" onClick={() => { setCur(0); setSelected(null); setAnswered(false); setScore(0); setDone(false); }}>Try Again</button>
+        </div>
+      </div>
+    );
+  }
+
+  const q = questions[cur];
+  return (
+    <div className="quiz-wrap">
+      <div className="quiz-header">
+        <div className="quiz-icon">📝</div>
+        <div className="quiz-header-text">
+          <div className="quiz-header-title">{isChapter ? 'Chapter Quiz' : 'Final Quiz'}</div>
+          <div className="quiz-header-sub">{title}</div>
+          <div className="quiz-progress-bar"><div className="quiz-progress-fill" style={{width:`${((cur)/questions.length)*100}%`}}/></div>
+        </div>
+      </div>
+      <div className="quiz-question-card">
+        <div className="quiz-q-num">Question {cur+1} of {questions.length}</div>
+        <div className="quiz-q-text">{q.q}</div>
+        <div className="quiz-options">
+          {q.options.map((opt,i) => (
+            <button key={i}
+              className={`quiz-option${selected===i ? ' selected' : ''}${answered && i===q.answer ? ' correct' : ''}${answered && selected===i && i!==q.answer ? ' wrong' : ''}`}
+              onClick={() => pick(i)} disabled={answered}>
+              <span className="quiz-option-letter">{letters[i]}</span>
+              {opt}
+            </button>
+          ))}
+        </div>
+        {answered && (
+          <div className={`quiz-feedback ${selected===q.answer ? 'correct' : 'wrong'}`} style={{marginTop:14}}>
+            <span>{selected===q.answer ? '✅' : '❌'}</span>
+            <span>{q.explain}</span>
+          </div>
+        )}
+      </div>
+      {answered && <button className="quiz-next-btn" onClick={next}>{cur<questions.length-1 ? 'Next Question →' : 'See Results'}</button>}
+    </div>
+  );
+}
+
+// ─── Book Reader ──────────────────────────────────────────────────────────────
+function BookReader({ book, profile, username, onBack, onProfileUpdate }) {
+  const [curChapter, setCurChapter] = useState(0);
+  const [mode, setMode] = useState('read'); // read | quiz | final-quiz
+  const [completedChapters, setCompletedChapters] = useState(
+    profile.chaptersCompleted?.[book.id] || []
+  );
+
+  const ch = book.chapters[curChapter];
+  const allDone = completedChapters.length >= book.chapters.length;
+
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, [curChapter, mode]);
+
+  function markChapterDone(chId) {
+    if (completedChapters.includes(chId)) return;
+    const nc = [...completedChapters, chId];
+    setCompletedChapters(nc);
+    const prev = getProfile(username);
+    const booksRead = [...new Set([...(prev.booksRead||[]), book.id])];
+    const chapMap = { ...(prev.chaptersCompleted||{}), [book.id]: nc };
+    const booksCompleted = nc.length >= book.chapters.length
+      ? [...new Set([...(prev.booksCompleted||[]), book.id])]
+      : (prev.booksCompleted||[]);
+    const { earned, newBadges } = checkBadges({ ...prev, booksRead, chaptersCompleted: chapMap, booksCompleted });
+    const np = updateProfile(username, { booksRead, chaptersCompleted: chapMap, booksCompleted, badges: earned, lastRead: new Date().toISOString() });
+    onProfileUpdate(np, newBadges);
+  }
+
+  function onChapterQuizDone(score, total) {
+    const isPerfect = score === total;
+    const prev = getProfile(username);
+    const qDone = (prev.quizzesCompleted||0) + 1;
+    const perf = isPerfect ? (prev.perfectQuizzes||0)+1 : (prev.perfectQuizzes||0);
+    const { earned, newBadges } = checkBadges({ ...prev, quizzesCompleted: qDone, perfectQuizzes: perf });
+    const np = updateProfile(username, { quizzesCompleted: qDone, perfectQuizzes: perf, badges: earned });
+    onProfileUpdate(np, newBadges);
+    markChapterDone(ch.id);
+    setMode('read');
+    if (curChapter < book.chapters.length - 1) setCurChapter(c => c+1);
+  }
+
+  function onFinalQuizDone(score, total) {
+    markChapterDone('final');
+    setMode('read');
+  }
+
+  const catColor = CAT_COLORS[book.category] || '#2c1810';
+
+  return (
+    <div className="reader-wrap fade-in">
+      <div className="reader-back" onClick={onBack}>← Back to Library</div>
+
+      <div className="reader-header">
+        <div className="reader-category" style={{color: catColor}}>{book.categoryLabel}</div>
+        <div className="reader-title">{book.title}</div>
+        <div className="reader-meta">
+          <span>📚 {book.chapters.length} {book.chapters.length===1?'Chapter':'Chapters'}</span>
+          <span>📖 {completedChapters.filter(c=>c!=='final').length}/{book.chapters.length} read</span>
+          {allDone && <span style={{color:'var(--gold)',fontWeight:800}}>✅ Completed!</span>}
+        </div>
+        <hr className="reader-divider"/>
+      </div>
+
+      {/* Chapter list */}
+      <div className="chapter-list">
+        <div className="chapter-list-header">
+          <span style={{fontSize:18}}>📜</span>
+          <div className="chapter-list-title">Table of Contents</div>
+        </div>
+        {book.chapters.map((c,i) => {
+          const done = completedChapters.includes(c.id);
+          const active = i === curChapter;
+          return (
+            <div key={c.id} className={`chapter-item${active?' active':''}${done?' done':''}`}
+              onClick={() => { setCurChapter(i); setMode('read'); }}>
+              <div className={`chapter-num${active?' active':done?' done':' default'}`}>
+                {done ? '✓' : c.num}
+              </div>
+              <div className="chapter-info">
+                <div className="chapter-name">{c.title}</div>
+                <div className="chapter-sub">Chapter {c.num}</div>
+              </div>
+              <div className="chapter-status">{done ? '✅' : active ? '▶️' : '○'}</div>
+            </div>
+          );
+        })}
+        {allDone && (
+          <div className={`chapter-item${mode==='final-quiz'?' active':''}`}
+            onClick={() => setMode('final-quiz')}
+            style={{background:'linear-gradient(90deg,#fef9e7,transparent)'}}>
+            <div className="chapter-num" style={{background:'var(--gold)',color:'var(--ink)'}}>★</div>
+            <div className="chapter-info">
+              <div className="chapter-name">Final Quiz — All Chapters</div>
+              <div className="chapter-sub">20 questions • Optional</div>
+            </div>
+            <div className="chapter-status">🏆</div>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      {mode === 'read' && (
+        <div className="story-content page-enter">
+          {/* Scene illustration */}
+          <div className="story-scene" style={{background: book.coverColor}}>
+            {book.useRealPhoto ? (
+              <div style={{textAlign:'center',padding:'20px'}}>
+                <div style={{fontSize:18,color:'rgba(253,246,227,0.8)',fontFamily:'var(--font-ui)',fontStyle:'italic',marginBottom:8}}>{book.photoDesc}</div>
+                <div style={{fontSize:60}}>🕌</div>
+                <div style={{fontSize:12,color:'rgba(253,246,227,0.5)',fontFamily:'var(--font-ui)',marginTop:8}}>[Real photograph to be added]</div>
+              </div>
+            ) : (
+              <>
+                <div className="story-scene-emoji">{ch.scene}</div>
+                <div className="story-scene-caption">{ch.sceneCaption}</div>
+              </>
+            )}
+          </div>
+
+          {/* Chapter header */}
+          <div className="story-chapter-header">
+            <div className="story-chapter-num">Chapter {ch.num}</div>
+            <div className="story-chapter-title">{ch.title}</div>
+          </div>
+
+          {/* Story text */}
+          <div className="story-body">
+            {ch.content.map((para, i) => (
+              <p key={i} dangerouslySetInnerHTML={{__html: para}}/>
+            ))}
+          </div>
+
+          {/* Lesson box */}
+          <div className="lesson-box">
+            <div className="lesson-box-title">📖 What We Learned</div>
+            {ch.learned.map((l,i) => <div key={i} className="lesson-item">{l}</div>)}
+          </div>
+
+          {/* Moral */}
+          <div className="moral-box">
+            <div className="moral-box-title">💎 Moral of the Story</div>
+            <div className="moral-text">"{ch.moral}"</div>
+          </div>
+
+          {/* Navigation */}
+          <div className="story-nav">
+            <button className="story-nav-btn" onClick={() => { if(curChapter>0){setCurChapter(c=>c-1);setMode('read');} }} disabled={curChapter===0}>
+              ← Previous
+            </button>
+            <div className="story-progress-dots">
+              {book.chapters.map((_,i) => (
+                <div key={i} className={`progress-dot${completedChapters.includes(book.chapters[i].id)?' done':i===curChapter?' current':''}`}
+                  onClick={() => { setCurChapter(i); setMode('read'); }}/>
+              ))}
+            </div>
+            <button className="story-nav-btn primary" onClick={() => setMode('quiz')}>
+              Chapter Quiz →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {mode === 'quiz' && (
+        <div className="story-content">
+          <Quiz questions={book.quizQuestions.slice(0, Math.min(5, book.quizQuestions.length))}
+            onComplete={onChapterQuizDone}
+            title={ch.title}
+            isChapter={true}/>
+        </div>
+      )}
+
+      {mode === 'final-quiz' && (
+        <div className="story-content">
+          <Quiz questions={book.quizQuestions}
+            onComplete={onFinalQuizDone}
+            title={book.title}
+            isChapter={false}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Library ──────────────────────────────────────────────────────────────────
+function Library({ profile, onOpenBook }) {
+  const [activeCat, setActiveCat] = useState('all');
+  const filtered = activeCat === 'all' ? BOOKS : BOOKS.filter(b => b.category === activeCat);
+
+  function getProgress(book) {
+    const done = profile.chaptersCompleted?.[book.id]?.length || 0;
+    return Math.round((done / book.chapters.length) * 100);
+  }
+
+  return (
+    <div>
+      {/* Hero */}
+      <div className="home-hero">
+        <div className="home-hero-inner">
+          <span className="home-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+          <div className="home-title">
+            Qisas-ul-<span className="home-title-gold">Saliheen</span>
+          </div>
+          <div className="home-subtitle">Stories of the Righteous — for young Muslim hearts</div>
+          <div className="home-stats">
+            <div className="home-stat">
+              <div className="home-stat-num">{BOOKS.length}</div>
+              <div className="home-stat-label">Stories</div>
+            </div>
+            <div className="home-stat">
+              <div className="home-stat-num">{BOOKS.reduce((a,b)=>a+b.chapters.length,0)}</div>
+              <div className="home-stat-label">Chapters</div>
+            </div>
+            <div className="home-stat">
+              <div className="home-stat-num">{profile.booksRead?.length || 0}</div>
+              <div className="home-stat-label">Books Read</div>
+            </div>
+            <div className="home-stat">
+              <div className="home-stat-num">{profile.badges?.length || 0}</div>
+              <div className="home-stat-label">Badges</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category tabs */}
+      <div className="category-tabs">
+        {CATEGORIES.map(c => (
+          <button key={c.id} className={`cat-tab${activeCat===c.id?' active':''}`}
+            onClick={() => setActiveCat(c.id)}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Book grid */}
+      <div className="books-grid-wrap">
+        <div className="books-grid-title">{CATEGORIES.find(c=>c.id===activeCat)?.label}</div>
+        <div className="books-grid">
+          {filtered.map(book => {
+            const prog = getProgress(book);
+            const done = prog === 100;
+            const catColor = CAT_COLORS[book.category] || '#2c1810';
+            return (
+              <div key={book.id} className="book-card fade-up" onClick={() => onOpenBook(book)}>
+                {book.isNew && !done && <span className="book-card-badge new">NEW</span>}
+                {done && <span className="book-card-badge done">✓ Done</span>}
+                <div className="book-cover" style={{background: book.coverColor}}>
+                  <div className="book-cover-emoji">{book.emoji}</div>
+                </div>
+                <div className="book-card-body">
+                  <div className="book-card-category" style={{color: catColor}}>{book.categoryLabel}</div>
+                  <div className="book-card-title">{book.title}</div>
+                  <div className="book-card-desc">{book.desc}</div>
+                  <div className="book-card-footer">
+                    <div className="book-card-chapters">{book.chapters.length} {book.chapters.length===1?'chapter':'chapters'}</div>
+                    <div style={{fontSize:12,fontFamily:'var(--font-ui)',fontWeight:700,color: prog>0?'var(--gold)':'var(--muted)'}}>
+                      {prog > 0 ? prog+'%' : 'Start'}
+                    </div>
+                  </div>
+                  <div className="book-card-progress">
+                    <div className="book-card-progress-fill" style={{width: prog+'%'}}/>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Badges Screen ────────────────────────────────────────────────────────────
+function BadgesScreen({ profile }) {
+  const earned = profile.badges || [];
+  return (
+    <div className="badges-wrap">
+      <div style={{marginBottom:24}}>
+        <div className="books-grid-title">My Badges</div>
+        <div style={{fontFamily:'var(--font-ui)',fontSize:13,color:'var(--muted)',fontWeight:600}}>
+          {earned.length} of {BADGES.length} badges earned
+        </div>
+      </div>
+      <div className="badges-grid">
+        {BADGES.map(b => {
+          const isEarned = earned.includes(b.id);
+          return (
+            <div key={b.id} className={`badge-card${isEarned?' earned':' locked'}`}>
+              <span className="badge-icon">{isEarned ? b.icon : '🔒'}</span>
+              <div className="badge-name">{b.name}</div>
+              <div className="badge-desc">{b.desc}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Parent Hub ───────────────────────────────────────────────────────────────
+function ParentHub({ allProfiles }) {
+  return (
+    <div className="parent-wrap">
+      <div className="books-grid-title" style={{marginBottom:20}}>Parent Overview</div>
+      {allProfiles.map(({ username, profile }) => (
+        <div key={username} style={{marginBottom:32}}>
+          <div style={{fontFamily:'var(--font-title)',fontSize:18,color:'var(--ink2)',marginBottom:14,fontWeight:600}}>
+            {profile.name || username}'s Progress
+          </div>
+          <div className="parent-grid">
+            <div className="parent-card">
+              <div className="parent-card-label">Books Read</div>
+              <div className="parent-card-value">{profile.booksRead?.length || 0}</div>
+              <div className="parent-card-sub">of {BOOKS.length} total</div>
+            </div>
+            <div className="parent-card">
+              <div className="parent-card-label">Books Completed</div>
+              <div className="parent-card-value">{profile.booksCompleted?.length || 0}</div>
+            </div>
+            <div className="parent-card">
+              <div className="parent-card-label">Quizzes Taken</div>
+              <div className="parent-card-value">{profile.quizzesCompleted || 0}</div>
+            </div>
+            <div className="parent-card">
+              <div className="parent-card-label">Perfect Scores</div>
+              <div className="parent-card-value">{profile.perfectQuizzes || 0}</div>
+            </div>
+            <div className="parent-card">
+              <div className="parent-card-label">Badges Earned</div>
+              <div className="parent-card-value">{profile.badges?.length || 0}</div>
+              <div className="parent-card-sub">of {BADGES.length} available</div>
+            </div>
+            <div className="parent-card">
+              <div className="parent-card-label">Reading Streak</div>
+              <div className="parent-card-value">{profile.streak || 0}</div>
+              <div className="parent-card-sub">days in a row</div>
+            </div>
+          </div>
+          {profile.booksRead && profile.booksRead.length > 0 && (
+            <div>
+              <div style={{fontFamily:'var(--font-ui)',fontSize:11,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:10}}>Books Read</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+                {profile.booksRead.map(id => {
+                  const bk = BOOKS.find(b=>b.id===id);
+                  return bk ? (
+                    <div key={id} style={{padding:'6px 12px',background:'var(--parchment2)',borderRadius:8,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)',border:'1px solid var(--border)'}}>
+                      {bk.emoji} {bk.title}
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          )}
+          <div style={{height:1,background:'var(--border)',margin:'24px 0'}}/>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── PDF Sidebar Item ──────────────────────────────────────────────────────────
+function PDFSidebar({ expanded, onToggle }) {
+  return (
+    <div className="pdf-section">
+      <div className="pdf-section-header" onClick={onToggle}>
+        <span style={{fontSize:16}}>📁</span>
+        <div className="pdf-section-title">PDF LIBRARY</div>
+        <span style={{marginLeft:'auto',fontSize:12,color:'rgba(232,184,75,0.6)'}}>{expanded?'▲':'▼'}</span>
+      </div>
+      {expanded && BOOKS.map(book => (
+        <div key={book.id} className="pdf-item">
+          <span className="pdf-item-icon">📄</span>
+          <div className="pdf-item-name">{book.title}</div>
+          <button className="pdf-download-btn" onClick={() => downloadBookPDF(book)}>⬇ TXT</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
+function App() {
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem(API_KEY_STORE) || '');
+  const [apiInput, setApiInput] = useState('');
+  const [apiErr, setApiErr] = useState('');
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const [authMode, setAuthMode] = useState('login'); // login | register
+  const [userType, setUserType] = useState('child');
+  const [uInput, setUInput] = useState('');
+  const [pInput, setPInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [authErr, setAuthErr] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+
+  const [username, setUsername] = useState(() => localStorage.getItem('qisas_user') || '');
+  const [isParent, setIsParent] = useState(false);
+  const [profile, setProfile] = useState({});
+
+  const [screen, setScreen] = useState('library'); // library | reader | badges | parent
+  const [activeBook, setActiveBook] = useState(null);
+  const [pdfExpanded, setPdfExpanded] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Load profile on mount
+  useEffect(() => {
+    if (username) {
+      const p = getProfile(username);
+      setProfile(p);
+    }
+  }, [username]);
+
+  // Simple auth (localStorage-based for demo; replace with Supabase in prod)
+  async function handleAuth() {
+    if (!uInput.trim() || !pInput.trim()) { setAuthErr('Please fill in all fields.'); return; }
+    if (authMode === 'register' && !nameInput.trim()) { setAuthErr('Please enter your name.'); return; }
+    setAuthLoading(true);
+    setAuthErr('');
+    await new Promise(r => setTimeout(r, 400));
+
+    const key = 'qisas_auth_' + uInput.trim().toLowerCase();
+    if (authMode === 'register') {
+      if (localStorage.getItem(key)) { setAuthErr('Username already exists.'); setAuthLoading(false); return; }
+      const hash = btoa(pInput);
+      localStorage.setItem(key, JSON.stringify({ hash, name: nameInput.trim(), type: userType }));
+      const p = { name: nameInput.trim(), booksRead:[], badges:[], streak:0 };
+      saveProfile(uInput.trim().toLowerCase(), p);
+      setProfile(p);
+      setUsername(uInput.trim().toLowerCase());
+      setIsParent(userType === 'parent');
+      localStorage.setItem('qisas_user', uInput.trim().toLowerCase());
+    } else {
+      const stored = localStorage.getItem(key);
+      if (!stored) { setAuthErr('Username not found.'); setAuthLoading(false); return; }
+      const { hash, type } = JSON.parse(stored);
+      if (hash !== btoa(pInput)) { setAuthErr('Incorrect password.'); setAuthLoading(false); return; }
+      const p = getProfile(uInput.trim().toLowerCase());
+      setProfile(p);
+      setUsername(uInput.trim().toLowerCase());
+      setIsParent(type === 'parent');
+      localStorage.setItem('qisas_user', uInput.trim().toLowerCase());
+    }
+    setAuthLoading(false);
+  }
+
+  async function validateApiKey(key) {
+    setApiLoading(true);
+    setApiErr('');
+    try {
+      await callClaude(key, [{ role:'user', content:'Say OK' }], '', 10);
+      localStorage.setItem(API_KEY_STORE, key);
+      setApiKey(key);
+    } catch(e) {
+      setApiErr('Invalid API key. Please check and try again.');
+    }
+    setApiLoading(false);
+  }
+
+  function logout() {
+    setUsername('');
+    localStorage.removeItem('qisas_user');
+    setScreen('library');
+    setActiveBook(null);
+  }
+
+  function handleProfileUpdate(newProfile, newBadges) {
+    setProfile(newProfile);
+    if (newBadges && newBadges.length > 0) {
+      setToast(`Badge earned: ${newBadges[0].icon} ${newBadges[0].name}!`);
+    }
+  }
+
+  // Get all child profiles for parent view
+  const allChildProfiles = isParent ? (() => {
+    const results = [];
+    for (let i=0; i<localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k.startsWith('qisas_auth_')) {
+        try {
+          const { type } = JSON.parse(localStorage.getItem(k));
+          if (type === 'child') {
+            const uname = k.replace('qisas_auth_', '');
+            results.push({ username: uname, profile: getProfile(uname) });
+          }
+        } catch {}
+      }
+    }
+    return results;
+  })() : [];
+
+  // API key screen
+  if (!apiKey) {
+    return (
+      <div className="auth-wrap">
+        <div className="auth-card" style={{animation:'fadeIn 0.5s ease'}}>
+          <span className="auth-crescent">☪️</span>
+          <div className="auth-title" style={{fontFamily:'var(--font-title)'}}>Qisas-ul-Saliheen</div>
+          <div className="auth-subtitle">Enter your Anthropic API key to begin</div>
+          {apiErr && <div className="auth-err">{apiErr}</div>}
+          <div className="auth-field">
+            <label className="auth-label">Anthropic API Key</label>
+            <input className="auth-inp" type="password" placeholder="sk-ant-..." value={apiInput} onChange={e=>setApiInput(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&validateApiKey(apiInput)}/>
+          </div>
+          <button className="auth-btn" onClick={() => validateApiKey(apiInput)} disabled={apiLoading}>
+            {apiLoading ? 'Checking...' : '✨ Enter the Library'}
+          </button>
+          <div style={{marginTop:16,fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',textAlign:'center'}}>
+            Your key is stored locally and never sent to any server except Anthropic.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Auth screen
+  if (!username) {
+    return (
+      <div className="auth-wrap">
+        <div className="auth-card" style={{animation:'fadeIn 0.5s ease'}}>
+          <span className="auth-crescent">☪️</span>
+          <div className="auth-title" style={{fontFamily:'var(--font-title)'}}>Qisas-ul-Saliheen</div>
+          <div className="auth-arabic">قصص الصالحين</div>
+          <div className="auth-tabs">
+            <button className={`auth-tab${authMode==='login'?' active':''}`} onClick={()=>{setAuthMode('login');setAuthErr('')}}>Sign In</button>
+            <button className={`auth-tab${authMode==='register'?' active':''}`} onClick={()=>{setAuthMode('register');setAuthErr('')}}>Register</button>
+          </div>
+          {authMode==='register' && (
+            <div className="auth-type-row">
+              <button className={`auth-type-btn${userType==='child'?' active':''}`} onClick={()=>setUserType('child')}>
+                <span className="auth-type-icon">👦</span>Child
+              </button>
+              <button className={`auth-type-btn${userType==='parent'?' active':''}`} onClick={()=>setUserType('parent')}>
+                <span className="auth-type-icon">👨</span>Parent
+              </button>
+            </div>
+          )}
+          {authErr && <div className="auth-err">{authErr}</div>}
+          {authMode==='register' && (
+            <div className="auth-field">
+              <label className="auth-label">Your Name</label>
+              <input className="auth-inp" placeholder="e.g. Ibraheem" value={nameInput} onChange={e=>setNameInput(e.target.value)}/>
+            </div>
+          )}
+          <div className="auth-field">
+            <label className="auth-label">Username</label>
+            <input className="auth-inp" placeholder="e.g. ibraheem" value={uInput} onChange={e=>setUInput(e.target.value)}/>
+          </div>
+          <div className="auth-field">
+            <label className="auth-label">Password</label>
+            <input className="auth-inp" type="password" placeholder="••••••••" value={pInput} onChange={e=>setPInput(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&handleAuth()}/>
+          </div>
+          <button className="auth-btn" onClick={handleAuth} disabled={authLoading}>
+            {authLoading ? 'One moment...' : authMode==='login' ? '📖 Enter the Library' : '🌟 Begin My Journey'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main app
+  return (
+    <div className="app">
+      {/* Header */}
+      <div className="header">
+        <span className="header-crescent">☪️</span>
+        <div className="header-logo">
+          Qisas-ul-Saliheen
+          <span>Stories of the Righteous</span>
+        </div>
+        <div className="header-right">
+          {!isParent && (
+            <>
+              <button className={`header-btn${screen==='library'?' active':''}`} onClick={()=>{setScreen('library');setActiveBook(null)}}>📚 Library</button>
+              <button className={`header-btn${screen==='badges'?' active':''}`} onClick={()=>setScreen('badges')}>🏅 Badges</button>
+            </>
+          )}
+          {isParent && (
+            <button className={`header-btn${screen==='parent'?' active':''}`} onClick={()=>setScreen('parent')}>📊 Overview</button>
+          )}
+          <div className="user-badge">
+            <span className="user-badge-icon">{isParent?'👨':'👦'}</span>
+            <span className="user-badge-name">{profile.name || username}</span>
+          </div>
+          <button className="header-btn" onClick={logout}>Sign Out</button>
+        </div>
+      </div>
+
+      <div className="main-layout">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="sidebar-section">
+            <div className="sidebar-section-title">Categories</div>
+            {CATEGORIES.filter(c=>c.id!=='all').map(c => {
+              const count = BOOKS.filter(b=>b.category===c.id).length;
+              return (
+                <div key={c.id} className="sidebar-item" onClick={()=>{setScreen('library');setActiveBook(null)}}>
+                  <span className="sidebar-item-icon">{c.label.split(' ')[0]}</span>
+                  <div className="sidebar-item-text">
+                    <div className="sidebar-item-name">{c.label.split(' ').slice(1).join(' ')}</div>
+                    <div className="sidebar-item-sub">{count} {count===1?'story':'stories'}</div>
+                  </div>
+                  <span className="sidebar-item-badge">{count}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="sidebar-divider"/>
+
+          {!isParent && (
+            <div className="sidebar-section">
+              <div className="sidebar-section-title">My Progress</div>
+              <div className="sidebar-item">
+                <span className="sidebar-item-icon">📖</span>
+                <div className="sidebar-item-text">
+                  <div className="sidebar-item-name">Books Read</div>
+                  <div className="sidebar-item-sub">{profile.booksRead?.length || 0} of {BOOKS.length}</div>
+                </div>
+              </div>
+              <div className="sidebar-item">
+                <span className="sidebar-item-icon">🏅</span>
+                <div className="sidebar-item-text">
+                  <div className="sidebar-item-name">Badges</div>
+                  <div className="sidebar-item-sub">{profile.badges?.length || 0} earned</div>
+                </div>
+              </div>
+              <div className="sidebar-item">
+                <span className="sidebar-item-icon">⭐</span>
+                <div className="sidebar-item-text">
+                  <div className="sidebar-item-name">Perfect Quizzes</div>
+                  <div className="sidebar-item-sub">{profile.perfectQuizzes || 0}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="sidebar-divider"/>
+
+          {/* PDF Library */}
+          <PDFSidebar expanded={pdfExpanded} onToggle={()=>setPdfExpanded(e=>!e)}/>
+        </div>
+
+        {/* Main content */}
+        <div className="content">
+          {screen === 'library' && !activeBook && (
+            <Library profile={profile} onOpenBook={book=>{setActiveBook(book);setScreen('reader');}}/>
+          )}
+          {screen === 'reader' && activeBook && (
+            <BookReader book={activeBook} profile={profile} username={username}
+              onBack={()=>{setScreen('library');setActiveBook(null)}}
+              onProfileUpdate={handleProfileUpdate}/>
+          )}
+          {screen === 'badges' && <BadgesScreen profile={profile}/>}
+          {screen === 'parent' && <ParentHub allProfiles={allChildProfiles}/>}
+        </div>
+      </div>
+
+      {toast && <Toast msg={toast} onDone={()=>setToast(null)}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
