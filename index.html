@@ -603,110 +603,121 @@ function VoiceToggle({ voice }) {
   );
 }
 
-// ─── Auth Helpers ─────────────────────────────────────────────────────────────
-function getProfile(username) {
-  try { return JSON.parse(localStorage.getItem('qisas_' + username)) || {}; } catch { return {}; }
+// ─── Supabase + Auth ─────────────────────────────────────────────────────────
+const SB_URL = "https://cyqflkfdoduxgnynqgct.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5cWZsa2Zkb2R1eGdueW5xZ2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2Mzc5MTksImV4cCI6MjA5MDIxMzkxOX0.TLViuL8uODpWz7fp10PB2YuDaDzgHStHvIMqdXM72bU";
+const sbH = { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json", "Prefer": "return=representation" };
+
+const sb = {
+  // ── Child profiles (table: profiles) ──────────────────────────────────────
+  getProfile: async (u) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/profiles?username=eq." + encodeURIComponent(u) + "&select=*", { headers: sbH });
+      const d = await r.json();
+      return d && d[0] ? d[0] : null;
+    } catch { return null; }
+  },
+  upsertProfile: async (u, h, p) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/profiles", {
+        method: "POST",
+        headers: { ...sbH, "Prefer": "resolution=merge-duplicates" },
+        body: JSON.stringify({ username: u, password_hash: h, profile_data: p, updated_at: new Date().toISOString() })
+      });
+      return r.ok;
+    } catch { return false; }
+  },
+  updateProfile: async (u, p) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/profiles?username=eq." + encodeURIComponent(u), {
+        method: "PATCH", headers: sbH,
+        body: JSON.stringify({ profile_data: p, updated_at: new Date().toISOString() })
+      });
+      return r.ok;
+    } catch { return false; }
+  },
+  // ── Parent accounts (table: parent_accounts) ──────────────────────────────
+  getParent: async (u) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/parent_accounts?username=eq." + encodeURIComponent(u) + "&select=*", { headers: sbH });
+      const d = await r.json();
+      return d && d[0] ? d[0] : null;
+    } catch { return null; }
+  },
+  upsertParent: async (u, h, name, children) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/parent_accounts", {
+        method: "POST",
+        headers: { ...sbH, "Prefer": "resolution=merge-duplicates" },
+        body: JSON.stringify({ username: u, password_hash: h, full_name: name, children: children || [] })
+      });
+      return r.ok;
+    } catch { return false; }
+  },
+  updateParent: async (u, data) => {
+    try {
+      const r = await fetch(SB_URL + "/rest/v1/parent_accounts?username=eq." + encodeURIComponent(u), {
+        method: "PATCH", headers: sbH, body: JSON.stringify(data)
+      });
+      return r.ok;
+    } catch { return false; }
+  }
+};
+
+// SHA-256 hash — same as NOVA project
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
-function saveProfile(username, data) {
-  localStorage.setItem('qisas_' + username, JSON.stringify(data));
+
+// Local profile cache helpers (localStorage mirrors Supabase for speed)
+function getLocalProfile(username) {
+  try { return JSON.parse(localStorage.getItem("qisas_profile_" + username)) || {}; } catch { return {}; }
 }
-function updateProfile(username, updates) {
-  const p = getProfile(username);
+function saveLocalProfile(username, data) {
+  localStorage.setItem("qisas_profile_" + username, JSON.stringify(data));
+}
+// Save to both local cache AND Supabase
+async function saveProfile(username, data) {
+  saveLocalProfile(username, data);
+  await sb.updateProfile(username, data);
+}
+// Read from local cache (fast), fall back to Supabase
+async function getProfile(username) {
+  const local = getLocalProfile(username);
+  if (local && local.name) return local; // cached
+  const row = await sb.getProfile(username);
+  if (row && row.profile_data) {
+    saveLocalProfile(username, row.profile_data);
+    return row.profile_data;
+  }
+  return {};
+}
+async function updateProfile(username, updates) {
+  const p = getLocalProfile(username);
   const np = { ...p, ...updates };
-  saveProfile(username, np);
+  saveLocalProfile(username, np);
+  await sb.updateProfile(username, np);
   return np;
 }
 
-// ─── Backup / Restore ─────────────────────────────────────────────────────────
-// Collects everything from localStorage: all auth records + all profiles + voice pref
-function exportAllData() {
-  const snapshot = {
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    appName: 'qisas-ul-saliheen',
-    accounts: {},  // qisas_auth_{user} records
-    profiles: {},  // qisas_{user} profile objects
-    prefs: {}      // voice etc.
-  };
-
+// ─── Backup note — data now lives in Supabase ─────────────────────────────────
+// With Supabase auth, all progress is stored in the cloud automatically.
+// Export is kept as a local JSON snapshot for reference / migration.
+function exportLocalSnapshot() {
+  const snapshot = { version: 3, exportedAt: new Date().toISOString(), appName: "qisas-ul-saliheen", profiles: {} };
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (!k) continue;
-    try {
-      const v = localStorage.getItem(k);
-      if (k.startsWith('qisas_auth_')) {
-        snapshot.accounts[k] = JSON.parse(v);
-      } else if (k.startsWith('qisas_') && k !== 'qisas_user') {
-        snapshot.profiles[k] = JSON.parse(v);
-      } else if (k === 'qisas_voice') {
-        snapshot.prefs[k] = v;
-      }
-    } catch {}
-  }
-
-  const json = JSON.stringify(snapshot, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  const date = new Date().toISOString().slice(0,10);
-  a.href     = url;
-  a.download = `qisas-backup-${date}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  return snapshot;
-}
-
-// Returns { ok, message, counts } — does NOT reload the page, caller decides
-function importData(jsonText) {
-  let data;
-  try {
-    data = JSON.parse(jsonText);
-  } catch {
-    return { ok: false, message: 'File is not valid JSON. Please choose a valid backup file.' };
-  }
-
-  if (data.appName !== 'qisas-ul-saliheen') {
-    return { ok: false, message: 'This file is not a Qisas-ul-Saliheen backup. Please use the correct file.' };
-  }
-
-  let accountsRestored = 0;
-  let profilesRestored = 0;
-
-  // Restore auth records
-  if (data.accounts && typeof data.accounts === 'object') {
-    for (const [k, v] of Object.entries(data.accounts)) {
-      if (k.startsWith('qisas_auth_')) {
-        localStorage.setItem(k, JSON.stringify(v));
-        accountsRestored++;
-      }
+    if (k && k.startsWith("qisas_profile_")) {
+      try { snapshot.profiles[k] = JSON.parse(localStorage.getItem(k)); } catch {}
     }
   }
-
-  // Restore profiles
-  if (data.profiles && typeof data.profiles === 'object') {
-    for (const [k, v] of Object.entries(data.profiles)) {
-      if (k.startsWith('qisas_')) {
-        localStorage.setItem(k, JSON.stringify(v));
-        profilesRestored++;
-      }
-    }
-  }
-
-  // Restore prefs
-  if (data.prefs && typeof data.prefs === 'object') {
-    for (const [k, v] of Object.entries(data.prefs)) {
-      localStorage.setItem(k, v);
-    }
-  }
-
-  return {
-    ok: true,
-    message: `Restored ${accountsRestored} account(s) and ${profilesRestored} profile(s) successfully.`,
-    counts: { accountsRestored, profilesRestored }
-  };
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "qisas-snapshot-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 const BADGES = [
   { id: 'first-story', icon: '📖', name: 'First Story', desc: 'Read your first story', check: p => p.booksRead && p.booksRead.length >= 1 },
@@ -2970,11 +2981,11 @@ function BackupPanel({ onImportDone }) {
     e.target.value = '';
   }
 
-  // Count current local accounts
+  // Count current local profile caches
   let localCount = 0;
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith('qisas_auth_')) localCount++;
+    if (k && k.startsWith('qisas_profile_')) localCount++;
   }
 
   return (
@@ -3052,19 +3063,64 @@ function BackupPanel({ onImportDone }) {
 }
 
 // ─── ParentHub ────────────────────────────────────────────────────────────────
-function ParentHub({ allProfiles, onRefresh }) {
-  const [tab, setTab]             = useState('children');   // 'children' | 'manage' | 'backup'
-  const [selected, setSelected]   = useState(null);         // username of selected child
+function ParentHub({ allProfiles, onRefresh, parentData, onParentDataUpdate }) {
+  const [tab, setTab]             = useState('children');
+  const [selected, setSelected]   = useState(null);
   const [editName, setEditName]   = useState('');
-  const [editMsg, setEditMsg]     = useState(null);          // {type:'ok'|'err', text}
+  const [editMsg, setEditMsg]     = useState(null);
   const [newPass, setNewPass]     = useState('');
   const [newPass2, setNewPass2]   = useState('');
   const [passMsg, setPassMsg]     = useState(null);
   const [saving, setSaving]       = useState(false);
 
-  // makeHash must be available here (duplicate definition is safe — same pure fn)
-  function hashPw(pw) {
-    try { return btoa(encodeURIComponent(pw)); } catch { return btoa(pw); }
+  // Add Child state
+  const [addChildUser, setAddChildUser] = useState('');
+  const [addChildErr, setAddChildErr]   = useState('');
+  const [addChildLoading, setAddChildLoading] = useState(false);
+  const [addChildSuccess, setAddChildSuccess] = useState('');
+
+  // ── Add Child — looks up child in Supabase, links to parent ──────────────
+  async function handleAddChild() {
+    const childUser = addChildUser.trim().toLowerCase();
+    if (!childUser) { setAddChildErr('Please enter a username.'); return; }
+    setAddChildLoading(true); setAddChildErr(''); setAddChildSuccess('');
+    const row = await sb.getProfile(childUser);
+    if (!row) {
+      setAddChildErr('No child account found with username "' + childUser + '". Ask them to register first.');
+      setAddChildLoading(false); return;
+    }
+    const currentChildren = parentData ? (parentData.children || []) : [];
+    if (currentChildren.includes(childUser)) {
+      setAddChildErr('"' + childUser + '" is already linked to your account.');
+      setAddChildLoading(false); return;
+    }
+    const newChildren = [...currentChildren, childUser];
+    const parentUser = localStorage.getItem('qisas_user');
+    const ok = await sb.updateParent(parentUser, { children: newChildren });
+    if (ok) {
+      const updated = { ...parentData, children: newChildren };
+      if (onParentDataUpdate) onParentDataUpdate(updated);
+      setAddChildSuccess('"' + (row.profile_data?.name || childUser) + '" linked successfully! ✅');
+      setAddChildUser('');
+      if (onRefresh) onRefresh();
+    } else {
+      setAddChildErr('Could not link child. Check your connection and try again.');
+    }
+    setAddChildLoading(false);
+  }
+
+  // ── Remove Child from parent's list ──────────────────────────────────────
+  async function handleRemoveChild(childUser) {
+    const currentChildren = parentData ? (parentData.children || []) : [];
+    const newChildren = currentChildren.filter(c => c !== childUser);
+    const parentUser = localStorage.getItem('qisas_user');
+    const ok = await sb.updateParent(parentUser, { children: newChildren });
+    if (ok) {
+      const updated = { ...parentData, children: newChildren };
+      if (onParentDataUpdate) onParentDataUpdate(updated);
+      if (selected === childUser) setSelected(null);
+      if (onRefresh) onRefresh();
+    }
   }
 
   // Get fresh child data for selected child
@@ -3090,21 +3146,19 @@ function ParentHub({ allProfiles, onRefresh }) {
     const trimmed = editName.trim();
     if (!trimmed) { setEditMsg({type:'err', text:'Name cannot be empty.'}); return; }
     setSaving(true); setEditMsg(null);
-    await new Promise(r => setTimeout(r,200));
-    // Update auth record
-    const authKey = 'qisas_auth_' + selected;
-    try {
-      const rec = JSON.parse(localStorage.getItem(authKey) || '{}');
-      rec.name = trimmed;
-      localStorage.setItem(authKey, JSON.stringify(rec));
-    } catch {}
-    // Update profile
-    const p = getProfile(selected);
-    p.name = trimmed;
-    saveProfile(selected, p);
-    setEditMsg({type:'ok', text:`Name updated to "${trimmed}" ✅`});
+    // Update profile in Supabase
+    const row = await sb.getProfile(selected);
+    const base = row ? (row.profile_data || {}) : {};
+    const updated = { ...base, name: trimmed };
+    const ok = await sb.updateProfile(selected, updated);
+    if (ok) {
+      saveLocalProfile(selected, updated);
+      setEditMsg({type:'ok', text:`Name updated to "${trimmed}" ✅`});
+      if (onRefresh) onRefresh();
+    } else {
+      setEditMsg({type:'err', text:'Could not save. Check connection and try again.'});
+    }
     setSaving(false);
-    if (onRefresh) onRefresh();
   }
 
   // ── Reset password ─────────────────────────────────────────────────────────
@@ -3113,16 +3167,34 @@ function ParentHub({ allProfiles, onRefresh }) {
     if (newPass !== newPass2) { setPassMsg({type:'err', text:'Passwords do not match.'}); return; }
     if (newPass.length < 4) { setPassMsg({type:'err', text:'Password must be at least 4 characters.'}); return; }
     setSaving(true); setPassMsg(null);
-    await new Promise(r => setTimeout(r,200));
-    const authKey = 'qisas_auth_' + selected;
     try {
-      const rec = JSON.parse(localStorage.getItem(authKey) || '{}');
-      rec.hash = hashPw(newPass.trim());
-      localStorage.setItem(authKey, JSON.stringify(rec));
-      setPassMsg({type:'ok', text:'Password updated successfully ✅'});
-      setNewPass(''); setNewPass2('');
-    } catch {
-      setPassMsg({type:'err', text:'Could not update password. Try again.'});
+      const hash = await hashPassword(newPass.trim());
+      // Check if child or parent account
+      const childRow = await sb.getProfile(selected);
+      let ok = false;
+      if (childRow) {
+        // Update password_hash directly on profiles table
+        const r = await fetch(SB_URL + "/rest/v1/profiles?username=eq." + encodeURIComponent(selected), {
+          method: "PATCH", headers: sbH,
+          body: JSON.stringify({ password_hash: hash, updated_at: new Date().toISOString() })
+        });
+        ok = r.ok;
+      } else {
+        // Try parent_accounts
+        const r = await fetch(SB_URL + "/rest/v1/parent_accounts?username=eq." + encodeURIComponent(selected), {
+          method: "PATCH", headers: sbH,
+          body: JSON.stringify({ password_hash: hash })
+        });
+        ok = r.ok;
+      }
+      if (ok) {
+        setPassMsg({type:'ok', text:'Password updated successfully ✅'});
+        setNewPass(''); setNewPass2('');
+      } else {
+        setPassMsg({type:'err', text:'Could not update password. Check connection.'});
+      }
+    } catch(e) {
+      setPassMsg({type:'err', text:'Error: ' + e.message});
     }
     setSaving(false);
   }
@@ -3374,10 +3446,43 @@ function ParentHub({ allProfiles, onRefresh }) {
         {/* ══════ TAB: MANAGE ══════ */}
         {tab === 'manage' && (
           <div>
+            {/* ── Add Child panel ── */}
+            <div className="detail-panel" style={{marginBottom:20}}>
+              <div className="detail-header">
+                <div style={{flex:1}}>
+                  <div className="detail-title" style={{fontSize:16}}>➕ Link a Child Account</div>
+                  <div className="detail-sub">Enter your child's username to add them to your dashboard</div>
+                </div>
+              </div>
+              <div className="detail-body" style={{paddingTop:16,paddingBottom:16}}>
+                <div className="edit-form">
+                  <div className="edit-row">
+                    <div className="edit-field">
+                      <label className="edit-label">Child's Username</label>
+                      <input className="edit-inp"
+                        placeholder="e.g. ibraheem"
+                        value={addChildUser}
+                        onChange={e=>{ setAddChildUser(e.target.value); setAddChildErr(''); setAddChildSuccess(''); }}
+                        onKeyDown={e=>e.key==='Enter'&&handleAddChild()}/>
+                    </div>
+                    <button className="edit-btn primary" onClick={handleAddChild} disabled={addChildLoading||!addChildUser.trim()}>
+                      {addChildLoading ? 'Looking up…' : 'Link Child'}
+                    </button>
+                  </div>
+                  {addChildErr    && <div className="edit-error">{addChildErr}</div>}
+                  {addChildSuccess && <div className="edit-success">{addChildSuccess}</div>}
+                  <div style={{fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',marginTop:8,fontWeight:600}}>
+                    💡 Your child must register their own account first (choose "Child" on the sign-in page), then you can link them here.
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {allProfiles.length === 0 && (
-              <div style={{textAlign:'center',padding:'48px 20px',color:'var(--muted)',fontFamily:'var(--font-ui)'}}>
-                <div style={{fontSize:48,marginBottom:16}}>⚙️</div>
-                <div style={{fontWeight:800,fontSize:16,color:'var(--ink2)'}}>No child accounts registered yet.</div>
+              <div style={{textAlign:'center',padding:'32px 20px',color:'var(--muted)',fontFamily:'var(--font-ui)'}}>
+                <div style={{fontSize:40,marginBottom:12}}>👦</div>
+                <div style={{fontWeight:800,fontSize:15,color:'var(--ink2)'}}>No children linked yet.</div>
+                <div style={{fontSize:12,fontWeight:600,marginTop:6}}>Use the form above to link your first child.</div>
               </div>
             )}
 
@@ -3395,8 +3500,10 @@ function ParentHub({ allProfiles, onRefresh }) {
                       <div className="detail-title" style={{fontSize:17}}>{prof.name || uname}</div>
                       <div className="detail-sub">@{uname}</div>
                     </div>
-                    <div style={{color:'rgba(232,184,75,0.6)',fontFamily:'var(--font-ui)',fontSize:13,fontWeight:800}}>
-                      {isOpen ? '▲ Close' : '▼ Edit'}
+                    <div style={{display:'flex',alignItems:'center',gap:10}}>
+                      <div style={{color:'rgba(232,184,75,0.6)',fontFamily:'var(--font-ui)',fontSize:13,fontWeight:800}}>
+                        {isOpen ? '▲ Close' : '▼ Edit'}
+                      </div>
                     </div>
                   </div>
 
@@ -3469,6 +3576,20 @@ function ParentHub({ allProfiles, onRefresh }) {
                         </div>
                       </div>
 
+                      {/* ── Remove Child ── */}
+                      <div className="detail-section" style={{marginBottom:0,marginTop:20}}>
+                        <div className="detail-section-title">🗑️ Remove Child</div>
+                        <div className="edit-form" style={{background:'#fdf2f2',borderColor:'#fca5a5'}}>
+                          <div style={{fontFamily:'var(--font-ui)',fontSize:12,fontWeight:600,color:'var(--muted)',marginBottom:12}}>
+                            This removes <strong>{prof.name || uname}</strong> from your dashboard only. Their account and all reading progress will be kept safe.
+                          </div>
+                          <button className="edit-btn danger"
+                            onClick={() => { if(window.confirm('Remove ' + (prof.name||uname) + ' from your dashboard? Their account and progress will not be deleted.')) handleRemoveChild(uname); }}>
+                            Remove from Dashboard
+                          </button>
+                        </div>
+                      </div>
+
                     </div>
                   )}
                 </div>
@@ -3492,103 +3613,139 @@ function App() {
   // Auth state
   const [authMode, setAuthMode] = useState('login');
   const [userType, setUserType] = useState('child');
-  const [uInput, setUInput] = useState('');
-  const [pInput, setPInput] = useState('');
+  const [uInput, setUInput]     = useState('');
+  const [pInput, setPInput]     = useState('');
   const [nameInput, setNameInput] = useState('');
-  const [authErr, setAuthErr] = useState('');
+  const [authErr, setAuthErr]   = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
   // Session state
   const [username, setUsername] = useState(() => localStorage.getItem('qisas_user') || '');
-  const [isParent, setIsParent] = useState(() => {
+  const [isParent, setIsParent] = useState(() => localStorage.getItem('qisas_account_type') === 'parent');
+  const [parentData, setParentData] = useState(null); // {username, full_name, children:[]}
+  const [profile, setProfile]   = useState(() => {
     const u = localStorage.getItem('qisas_user');
-    if (!u) return false;
-    try { return JSON.parse(localStorage.getItem('qisas_auth_'+u)||'{}').type === 'parent'; } catch { return false; }
-  });
-  const [profile, setProfile] = useState(() => {
-    const u = localStorage.getItem('qisas_user');
-    return u ? getProfile(u) : {};
+    return u ? getLocalProfile(u) : {};
   });
 
   const voice = useVoice();
-  const [screen, setScreen]       = useState('library');
+  const [screen, setScreen]         = useState('library');
   const [activeBook, setActiveBook] = useState(null);
-  const [activeCat, setActiveCat] = useState('all');
-  const [toast, setToast]         = useState(null);
-  const [refreshTick, setRefreshTick] = useState(0); // bump to re-read child profiles
+  const [activeCat, setActiveCat]   = useState('all');
+  const [toast, setToast]           = useState(null);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [authStatus, setAuthStatus] = useState(''); // loading indicator text
 
-  // ── Auth ──────────────────────────────────────────────────────────────────
-  // Consistent hash: same function used for both register and login
-  function makeHash(pw) {
-    try { return btoa(encodeURIComponent(pw)); } catch(e) { return btoa(pw); }
-  }
+  // Load parent data on mount if parent is already logged in
+  useEffect(() => {
+    const u = localStorage.getItem('qisas_user');
+    const type = localStorage.getItem('qisas_account_type');
+    if (u && type === 'parent' && !parentData) {
+      sb.getParent(u).then(row => { if (row) setParentData(row); });
+    }
+    if (u && type === 'child' && !(profile && profile.name)) {
+      sb.getProfile(u).then(row => {
+        if (row && row.profile_data) {
+          saveLocalProfile(u, row.profile_data);
+          setProfile(row.profile_data);
+        }
+      });
+    }
+  }, []);
 
+  // ── Auth — matches NOVA pattern exactly ──────────────────────────────────
   async function handleAuth() {
     const user = uInput.trim().toLowerCase();
     const pass = pInput.trim();
     const name = nameInput.trim();
 
     if (!user || !pass) { setAuthErr('Please fill in all fields.'); return; }
-    if (authMode === 'register' && !name) { setAuthErr('Please enter your name.'); return; }
-
-    setAuthLoading(true); setAuthErr('');
-    await new Promise(r => setTimeout(r, 250));
-
-    const storageKey = 'qisas_auth_' + user;
-
-    if (authMode === 'register') {
-      if (localStorage.getItem(storageKey)) {
-        setAuthErr('Username already taken. Please sign in instead.');
-        setAuthLoading(false); return;
-      }
-      // Save auth record with consistent hash
-      localStorage.setItem(storageKey, JSON.stringify({ hash: makeHash(pass), name, type: userType }));
-
-      // Save blank profile
-      const p = { name, booksRead:[], badges:[], streak:0, chaptersCompleted:{}, booksCompleted:[], quizzesCompleted:0, perfectQuizzes:0 };
-      saveProfile(user, p);
-      localStorage.setItem('qisas_user', user);
-      setProfile(p);
-      setUsername(user);
-      setIsParent(userType === 'parent');
-
-    } else {
-      // Login — look up stored record
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) {
-        setAuthErr('No account found for "' + user + '". Please register first.');
-        setAuthLoading(false); return;
-      }
-      let record;
-      try { record = JSON.parse(raw); } catch(e) {
-        setAuthErr('Account data error. Please register again.');
-        setAuthLoading(false); return;
-      }
-      // Accept both hash formats for backwards compatibility
-      const ok = record.hash === makeHash(pass)
-               || record.hash === btoa(pass)
-               || record.hash === btoa(unescape(encodeURIComponent(pass)));
-      if (!ok) {
-        setAuthErr('Incorrect password. Please try again.');
-        setAuthLoading(false); return;
-      }
-      const p = getProfile(user);
-      localStorage.setItem('qisas_user', user);
-      setProfile(p);
-      setUsername(user);
-      setIsParent(record.type === 'parent');
+    if (user.length < 3) { setAuthErr('Username must be at least 3 characters.'); return; }
+    if (pass.length < 4) { setAuthErr('Password must be at least 4 characters.'); return; }
+    if (authMode === 'register' && userType === 'parent' && !name) {
+      setAuthErr('Please enter your full name.'); return;
+    }
+    if (authMode === 'register' && userType === 'child' && !name) {
+      setAuthErr('Please enter your name.'); return;
     }
 
-    setAuthLoading(false);
+    setAuthLoading(true); setAuthErr('');
+    setAuthStatus(authMode === 'login' ? 'Signing in…' : 'Creating account…');
+
+    try {
+      const hash = await hashPassword(pass);
+
+      if (userType === 'parent') {
+        if (authMode === 'register') {
+          const existing = await sb.getParent(user);
+          if (existing) { setAuthErr('Username already taken. Please sign in instead.'); setAuthLoading(false); return; }
+          const ok = await sb.upsertParent(user, hash, name, []);
+          if (!ok) { setAuthErr('Could not create account. Check your connection and try again.'); setAuthLoading(false); return; }
+          const row = await sb.getParent(user);
+          localStorage.setItem('qisas_user', user);
+          localStorage.setItem('qisas_account_type', 'parent');
+          setParentData(row);
+          setUsername(user);
+          setIsParent(true);
+          setAuthLoading(false);
+        } else {
+          setAuthStatus('Looking up account…');
+          const row = await sb.getParent(user);
+          if (!row) { setAuthErr('No parent account found for "' + user + '". Please register first.'); setAuthLoading(false); return; }
+          if (row.password_hash !== hash) { setAuthErr('Incorrect password. Please try again.'); setAuthLoading(false); return; }
+          localStorage.setItem('qisas_user', user);
+          localStorage.setItem('qisas_account_type', 'parent');
+          setParentData(row);
+          setUsername(user);
+          setIsParent(true);
+          setAuthLoading(false);
+        }
+      } else {
+        // Child account
+        if (authMode === 'register') {
+          const existing = await sb.getProfile(user);
+          if (existing) { setAuthErr('Username already taken. Please sign in instead.'); setAuthLoading(false); return; }
+          const blankProfile = { name, booksRead:[], badges:[], streak:0, chaptersCompleted:{}, booksCompleted:[], quizzesCompleted:0, perfectQuizzes:0 };
+          const ok = await sb.upsertProfile(user, hash, blankProfile);
+          if (!ok) { setAuthErr('Could not create account. Check your connection and try again.'); setAuthLoading(false); return; }
+          saveLocalProfile(user, blankProfile);
+          localStorage.setItem('qisas_user', user);
+          localStorage.setItem('qisas_account_type', 'child');
+          setProfile(blankProfile);
+          setUsername(user);
+          setIsParent(false);
+          setAuthLoading(false);
+        } else {
+          setAuthStatus('Looking up account…');
+          const row = await sb.getProfile(user);
+          if (!row) { setAuthErr('No account found for "' + user + '". Please register first.'); setAuthLoading(false); return; }
+          if (row.password_hash !== hash) { setAuthErr('Incorrect password. Please try again.'); setAuthLoading(false); return; }
+          const pd = row.profile_data || {};
+          saveLocalProfile(user, pd);
+          localStorage.setItem('qisas_user', user);
+          localStorage.setItem('qisas_account_type', 'child');
+          setProfile(pd);
+          setUsername(user);
+          setIsParent(false);
+          setAuthLoading(false);
+        }
+      }
+    } catch(e) {
+      setAuthErr('Connection error: ' + e.message + '. Check your internet and try again.');
+      setAuthLoading(false);
+    }
+    setAuthStatus('');
   }
 
-  // ── FIX: Sign Out — clears user state and goes back to AUTH (not API key) ──
+  // ── Sign Out ─────────────────────────────────────────────────────────────
   function logout() {
     voice.stop();
     localStorage.removeItem('qisas_user');
+    localStorage.removeItem('qisas_account_type');
     setUsername('');
     setIsParent(false);
     setProfile({});
+    setParentData(null);
     setScreen('library');
     setActiveBook(null);
     setActiveCat('all');
@@ -3596,10 +3753,14 @@ function App() {
     setPInput('');
     setNameInput('');
     setAuthErr('');
+    setAuthStatus('');
   }
 
-  function handleProfileUpdate(newProfile, newBadges) {
+  async function handleProfileUpdate(newProfile, newBadges) {
     setProfile(newProfile);
+    // Save to Supabase in background
+    saveLocalProfile(username, newProfile);
+    sb.updateProfile(username, newProfile);
     if (newBadges && newBadges.length > 0) {
       setToast(`Badge earned: ${newBadges[0].icon} ${newBadges[0].name}!`);
     }
@@ -3612,42 +3773,31 @@ function App() {
     setActiveBook(null);
   }
 
-  // Re-reads every time refreshTick changes (after parent edits a child)
-  const allChildProfiles = useCallback(() => {
-    if (!isParent) return [];
-    const results = [];
-    for (let i=0; i<localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('qisas_auth_')) {
-        try {
-          const { type } = JSON.parse(localStorage.getItem(k));
-          if (type === 'child') {
-            const uname = k.replace('qisas_auth_', '');
-            results.push({ username: uname, profile: getProfile(uname) });
-          }
-        } catch {}
-      }
-    }
-    return results;
+  // ── Load child profiles for parent (from Supabase) ─────────────────────
+  const [childProfilesMap, setChildProfilesMap] = useState({});
+
+  useEffect(() => {
+    if (!isParent || !parentData) return;
+    const children = parentData.children || [];
+    if (children.length === 0) return;
+    // Fetch each child's profile from Supabase
+    Promise.all(children.map(async (childUser) => {
+      const row = await sb.getProfile(childUser);
+      return { username: childUser, profile: row ? (row.profile_data || {}) : {} };
+    })).then(results => {
+      const map = {};
+      results.forEach(r => { map[r.username] = r.profile; });
+      setChildProfilesMap(map);
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isParent, refreshTick])();
+  }, [isParent, parentData, refreshTick]);
+
+  const allChildProfiles = isParent && parentData
+    ? (parentData.children || []).map(u => ({ username: u, profile: childProfilesMap[u] || {} }))
+    : [];
 
   // ── Auth screen ────────────────────────────────────────────────────────────
   if (!username) {
-    // Detect saved accounts so we can show them
-    const savedAccounts = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('qisas_auth_')) {
-        try {
-          const rec = JSON.parse(localStorage.getItem(k));
-          savedAccounts.push({ user: k.replace('qisas_auth_', ''), name: rec.name, type: rec.type });
-        } catch {}
-      }
-    }
-    // Auto-detect: if user typed a known username, switch to login
-    const typedKnown = uInput.trim() && localStorage.getItem('qisas_auth_' + uInput.trim().toLowerCase());
-
     return (
       <div className="auth-wrap">
         <div className="auth-card" style={{animation:'fadeIn 0.5s ease'}}>
@@ -3655,81 +3805,68 @@ function App() {
           <div className="auth-title" style={{fontFamily:'var(--font-title)'}}>Qisas-ul-Saliheen</div>
           <div className="auth-arabic">قصص الصالحين</div>
 
-          {/* Quick-pick saved accounts */}
-          {savedAccounts.length > 0 && authMode === 'login' && (
-            <div style={{marginBottom:16}}>
-              <div style={{fontFamily:'var(--font-ui)',fontSize:10,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}>
-                Saved Accounts
-              </div>
-              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-                {savedAccounts.map(acc => (
-                  <button key={acc.user}
-                    style={{padding:'7px 14px',borderRadius:10,border:'2px solid var(--border)',background:uInput===acc.user?'var(--parchment2)':'var(--white)',fontFamily:'var(--font-ui)',fontSize:12,fontWeight:800,cursor:'pointer',color:'var(--ink)',transition:'all 0.2s',display:'flex',alignItems:'center',gap:6}}
-                    onClick={()=>setUInput(acc.user)}>
-                    {acc.type==='parent'?'👨':'👦'} {acc.name || acc.user}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="auth-tabs">
-            <button className={`auth-tab${authMode==='login'?' active':''}`} onClick={()=>{setAuthMode('login');setAuthErr('')}}>Sign In</button>
-            <button className={`auth-tab${authMode==='register'?' active':''}`} onClick={()=>{setAuthMode('register');setAuthErr('')}}>Register</button>
+            <button className={`auth-tab${authMode==='login'?' active':''}`}
+              onClick={()=>{setAuthMode('login');setAuthErr('');}}>Sign In</button>
+            <button className={`auth-tab${authMode==='register'?' active':''}`}
+              onClick={()=>{setAuthMode('register');setAuthErr('');}}>Register</button>
           </div>
 
-          {authMode==='register' && (
-            <div className="auth-type-row">
-              <button className={`auth-type-btn${userType==='child'?' active':''}`} onClick={()=>setUserType('child')}>
-                <span style={{fontSize:24}}>👦</span>Child
-              </button>
-              <button className={`auth-type-btn${userType==='parent'?' active':''}`} onClick={()=>setUserType('parent')}>
-                <span style={{fontSize:24}}>👨</span>Parent
-              </button>
-            </div>
-          )}
+          {/* Account type selector — shown on both login and register */}
+          <div className="auth-type-row">
+            <button className={`auth-type-btn${userType==='child'?' active':''}`} onClick={()=>setUserType('child')}>
+              <span style={{fontSize:24}}>👦</span>Child
+            </button>
+            <button className={`auth-type-btn${userType==='parent'?' active':''}`} onClick={()=>setUserType('parent')}>
+              <span style={{fontSize:24}}>👨</span>Parent
+            </button>
+          </div>
 
           {authErr && <div className="auth-err">{authErr}</div>}
 
-          {/* Smart hint: typed username exists, suggest signing in */}
-          {!authErr && typedKnown && authMode==='register' && (
-            <div style={{background:'#fef9e7',border:'1px solid var(--gold)',borderRadius:8,padding:'8px 12px',marginBottom:10,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)'}}>
-              ✅ That username exists — <span style={{color:'var(--teal)',cursor:'pointer',textDecoration:'underline'}} onClick={()=>setAuthMode('login')}>Sign in instead?</span>
-            </div>
-          )}
-          {!authErr && uInput.trim() && !typedKnown && authMode==='login' && (
-            <div style={{background:'#fef9e7',border:'1px solid var(--gold)',borderRadius:8,padding:'8px 12px',marginBottom:10,fontFamily:'var(--font-ui)',fontSize:12,fontWeight:700,color:'var(--ink2)'}}>
-              ℹ️ No account for "{uInput.trim()}" yet — <span style={{color:'var(--teal)',cursor:'pointer',textDecoration:'underline'}} onClick={()=>setAuthMode('register')}>Register instead?</span>
+          {/* Name field — required on register */}
+          {authMode === 'register' && (
+            <div className="auth-field">
+              <label className="auth-label">{userType === 'parent' ? 'Your Full Name' : 'Your Name'}</label>
+              <input className="auth-inp"
+                placeholder={userType === 'parent' ? 'e.g. Haleem Masood' : 'e.g. Ibraheem'}
+                value={nameInput} onChange={e=>setNameInput(e.target.value)}/>
             </div>
           )}
 
-          {authMode==='register' && (
-            <div className="auth-field">
-              <label className="auth-label">Your Name</label>
-              <input className="auth-inp" placeholder="e.g. Ibraheem" value={nameInput} onChange={e=>setNameInput(e.target.value)}/>
-            </div>
-          )}
           <div className="auth-field">
             <label className="auth-label">Username</label>
-            <input className="auth-inp" placeholder="e.g. ibraheem" value={uInput}
+            <input className="auth-inp"
+              placeholder={userType === 'parent' ? 'e.g. haleem' : 'e.g. ibraheem'}
+              value={uInput}
               onChange={e=>{setUInput(e.target.value);setAuthErr('');}}
               autoComplete="username"/>
           </div>
+
           <div className="auth-field">
             <label className="auth-label">Password</label>
-            <input className="auth-inp" type="password" placeholder="••••••••" value={pInput}
+            <input className="auth-inp" type="password" placeholder="Min. 4 characters"
+              value={pInput}
               onChange={e=>setPInput(e.target.value)}
               onKeyDown={e=>e.key==='Enter'&&handleAuth()}
               autoComplete={authMode==='login'?'current-password':'new-password'}/>
           </div>
+
           <button className="auth-btn" onClick={handleAuth} disabled={authLoading}>
-            {authLoading ? 'One moment...' : authMode==='login' ? '📖 Enter the Library' : '🌟 Create My Account'}
+            {authLoading
+              ? (authStatus || 'One moment…')
+              : authMode==='login'
+                ? '📖 Enter the Library'
+                : '🌟 Create My Account'}
           </button>
-          {authMode==='register' && (
-            <div style={{marginTop:12,fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',textAlign:'center',fontWeight:600}}>
-              Your account is saved in this browser. Next time, just sign in.
-            </div>
-          )}
+
+          <div style={{marginTop:14,fontFamily:'var(--font-ui)',fontSize:11,color:'var(--muted)',textAlign:'center',fontWeight:600,lineHeight:1.6}}>
+            {authMode==='register'
+              ? (userType==='parent'
+                  ? '👨 Parent accounts can view all linked children\'s progress and reset passwords.'
+                  : '👦 Child accounts save reading progress and badges to the cloud — sign in on any device.')
+              : '☁️ Accounts are stored securely in the cloud — sign in from any device.'}
+          </div>
         </div>
       </div>
     );
@@ -3849,7 +3986,12 @@ function App() {
               voice={voice}/>
           )}
           {screen === 'badges' && <BadgesScreen profile={profile}/>}
-          {screen === 'parent' && <ParentHub allProfiles={allChildProfiles} onRefresh={()=>setRefreshTick(t=>t+1)}/>}
+          {screen === 'parent' && <ParentHub
+            allProfiles={allChildProfiles}
+            onRefresh={()=>setRefreshTick(t=>t+1)}
+            parentData={parentData}
+            onParentDataUpdate={setParentData}
+          />}
         </div>
       </div>
 
