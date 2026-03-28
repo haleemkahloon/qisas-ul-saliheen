@@ -387,7 +387,36 @@ body{font-family:var(--font-body);background:var(--parchment);color:var(--ink)}
 /* Books read chips */
 .book-chip{padding:5px 12px;background:var(--parchment2);border-radius:20px;font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--ink2);border:1px solid var(--border);}
 
-/* ===== VOICE PLAYER ===== */
+/* ===== BACKUP / RESTORE ===== */
+.backup-banner{
+  background:linear-gradient(135deg,#1a2a1a,#2c1810);
+  border:1.5px solid rgba(201,148,42,0.35);
+  border-radius:14px;padding:18px 22px;
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:24px;
+}
+.backup-banner-icon{font-size:28px;flex-shrink:0}
+.backup-banner-text{flex:1}
+.backup-banner-title{font-family:var(--font-ui);font-size:13px;font-weight:800;color:var(--gold2);margin-bottom:3px}
+.backup-banner-sub{font-family:var(--font-ui);font-size:11px;color:rgba(253,246,227,0.6);font-weight:600;line-height:1.5}
+.backup-btn{
+  padding:8px 16px;border-radius:10px;border:none;
+  font-family:var(--font-ui);font-size:12px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;
+}
+.backup-btn.export{background:var(--gold);color:var(--ink);}
+.backup-btn.export:hover{background:var(--gold2)}
+.backup-btn.import{background:rgba(201,148,42,0.15);color:var(--gold2);border:1.5px solid rgba(201,148,42,0.4);}
+.backup-btn.import:hover{background:rgba(201,148,42,0.25)}
+.backup-btn:disabled{opacity:0.5;cursor:not-allowed}
+.backup-result{
+  border-radius:10px;padding:10px 14px;margin-top:12px;
+  font-family:var(--font-ui);font-size:12px;font-weight:700;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.backup-result.ok{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.backup-result.err{background:#fdf2f2;border:1px solid #fca5a5;color:#991b1b}
+.backup-result.warn{background:#fef9e7;border:1px solid var(--gold);color:var(--ink2)}
 @keyframes voicePulse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.6)}}
 .voice-bar{
   position:sticky;top:0;z-index:50;
@@ -588,7 +617,97 @@ function updateProfile(username, updates) {
   return np;
 }
 
-// ─── Badge logic ──────────────────────────────────────────────────────────────
+// ─── Backup / Restore ─────────────────────────────────────────────────────────
+// Collects everything from localStorage: all auth records + all profiles + voice pref
+function exportAllData() {
+  const snapshot = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    appName: 'qisas-ul-saliheen',
+    accounts: {},  // qisas_auth_{user} records
+    profiles: {},  // qisas_{user} profile objects
+    prefs: {}      // voice etc.
+  };
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k) continue;
+    try {
+      const v = localStorage.getItem(k);
+      if (k.startsWith('qisas_auth_')) {
+        snapshot.accounts[k] = JSON.parse(v);
+      } else if (k.startsWith('qisas_') && k !== 'qisas_user') {
+        snapshot.profiles[k] = JSON.parse(v);
+      } else if (k === 'qisas_voice') {
+        snapshot.prefs[k] = v;
+      }
+    } catch {}
+  }
+
+  const json = JSON.stringify(snapshot, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href     = url;
+  a.download = `qisas-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  return snapshot;
+}
+
+// Returns { ok, message, counts } — does NOT reload the page, caller decides
+function importData(jsonText) {
+  let data;
+  try {
+    data = JSON.parse(jsonText);
+  } catch {
+    return { ok: false, message: 'File is not valid JSON. Please choose a valid backup file.' };
+  }
+
+  if (data.appName !== 'qisas-ul-saliheen') {
+    return { ok: false, message: 'This file is not a Qisas-ul-Saliheen backup. Please use the correct file.' };
+  }
+
+  let accountsRestored = 0;
+  let profilesRestored = 0;
+
+  // Restore auth records
+  if (data.accounts && typeof data.accounts === 'object') {
+    for (const [k, v] of Object.entries(data.accounts)) {
+      if (k.startsWith('qisas_auth_')) {
+        localStorage.setItem(k, JSON.stringify(v));
+        accountsRestored++;
+      }
+    }
+  }
+
+  // Restore profiles
+  if (data.profiles && typeof data.profiles === 'object') {
+    for (const [k, v] of Object.entries(data.profiles)) {
+      if (k.startsWith('qisas_')) {
+        localStorage.setItem(k, JSON.stringify(v));
+        profilesRestored++;
+      }
+    }
+  }
+
+  // Restore prefs
+  if (data.prefs && typeof data.prefs === 'object') {
+    for (const [k, v] of Object.entries(data.prefs)) {
+      localStorage.setItem(k, v);
+    }
+  }
+
+  return {
+    ok: true,
+    message: `Restored ${accountsRestored} account(s) and ${profilesRestored} profile(s) successfully.`,
+    counts: { accountsRestored, profilesRestored }
+  };
+}
 const BADGES = [
   { id: 'first-story', icon: '📖', name: 'First Story', desc: 'Read your first story', check: p => p.booksRead && p.booksRead.length >= 1 },
   { id: 'chapter-champ', icon: '⭐', name: 'Chapter Champion', desc: 'Score 100% on a chapter quiz', check: p => p.perfectQuizzes && p.perfectQuizzes >= 1 },
@@ -2816,9 +2935,125 @@ function BadgesScreen({ profile }) {
   );
 }
 
+// ─── BackupPanel — standalone export/import widget ────────────────────────────
+function BackupPanel({ onImportDone }) {
+  const [importResult, setImportResult] = useState(null);
+  const [exporting, setExporting]       = useState(false);
+  const fileRef = useRef(null);
+
+  function handleExport() {
+    setExporting(true);
+    try {
+      const snap = exportAllData();
+      const n = Object.keys(snap.accounts).length;
+      setImportResult({ type:'ok', text: `Backup downloaded! Contains ${n} account(s). Save this file somewhere safe — your phone, email, or cloud storage.` });
+    } catch(e) {
+      setImportResult({ type:'err', text: 'Export failed: ' + e.message });
+    }
+    setExporting(false);
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = importData(ev.target.result);
+      if (result.ok) {
+        setImportResult({ type:'ok', text: '✅ ' + result.message + ' Reload the page or sign in to see restored accounts.' });
+        if (onImportDone) onImportDone();
+      } else {
+        setImportResult({ type:'err', text: '❌ ' + result.message });
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  // Count current local accounts
+  let localCount = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('qisas_auth_')) localCount++;
+  }
+
+  return (
+    <div>
+      <div className="backup-banner">
+        <div className="backup-banner-icon">💾</div>
+        <div className="backup-banner-text">
+          <div className="backup-banner-title">Backup & Restore Progress</div>
+          <div className="backup-banner-sub">
+            All reading progress is saved in <strong style={{color:'var(--gold2)'}}>this browser only</strong>.
+            Export regularly so your children never lose their badges and books read.
+            {localCount > 0 && <span> Currently storing <strong style={{color:'var(--gold2)'}}>{localCount} account(s)</strong>.</span>}
+          </div>
+        </div>
+      </div>
+
+      <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:16}}>
+        {/* Export */}
+        <div style={{flex:1,minWidth:220,background:'var(--white)',borderRadius:14,border:'1px solid var(--border)',padding:20,boxShadow:'0 2px 12px var(--shadow)'}}>
+          <div style={{fontFamily:'var(--font-ui)',fontSize:11,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}>Export Backup</div>
+          <div style={{fontFamily:'var(--font-body)',fontSize:13,color:'var(--ink2)',marginBottom:14,lineHeight:1.6}}>
+            Downloads a <code style={{background:'var(--parchment2)',padding:'1px 6px',borderRadius:4,fontSize:12}}>.json</code> file with all accounts, passwords, and every child's reading progress, badges, and quiz scores.
+          </div>
+          <button className="backup-btn export" onClick={handleExport} disabled={exporting} style={{width:'100%',padding:'12px'}}>
+            {exporting ? 'Preparing…' : '⬇ Download Backup File'}
+          </button>
+        </div>
+
+        {/* Import */}
+        <div style={{flex:1,minWidth:220,background:'var(--white)',borderRadius:14,border:'1px solid var(--border)',padding:20,boxShadow:'0 2px 12px var(--shadow)'}}>
+          <div style={{fontFamily:'var(--font-ui)',fontSize:11,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}>Restore from Backup</div>
+          <div style={{fontFamily:'var(--font-body)',fontSize:13,color:'var(--ink2)',marginBottom:14,lineHeight:1.6}}>
+            Choose a previously exported <code style={{background:'var(--parchment2)',padding:'1px 6px',borderRadius:4,fontSize:12}}>.json</code> backup file to restore all accounts and progress. Existing data will be merged — nothing will be deleted.
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json,application/json"
+            style={{display:'none'}}
+            onChange={handleFileChange}
+          />
+          <button className="backup-btn import" onClick={() => fileRef.current.click()} style={{width:'100%',padding:'12px'}}>
+            ⬆ Choose Backup File
+          </button>
+        </div>
+      </div>
+
+      {importResult && (
+        <div className={`backup-result ${importResult.type}`}>
+          <span>{importResult.text}</span>
+          <span style={{marginLeft:'auto',cursor:'pointer',opacity:0.6,flexShrink:0}} onClick={()=>setImportResult(null)}>✕</span>
+        </div>
+      )}
+
+      {/* How it works */}
+      <div style={{background:'var(--parchment)',borderRadius:12,border:'1px solid var(--border)',padding:18,marginTop:8}}>
+        <div style={{fontFamily:'var(--font-ui)',fontSize:10,fontWeight:800,letterSpacing:'2px',textTransform:'uppercase',color:'var(--muted)',marginBottom:12}}>How to use across devices</div>
+        {[
+          ['1', 'Export a backup here on your current device — it downloads a .json file'],
+          ['2', 'Email the file to yourself, or save it to iCloud / Google Drive / WhatsApp yourself'],
+          ['3', 'On the new device, open the app and sign in as a parent'],
+          ['4', 'Go to Parent Hub → Backup & Restore → Choose Backup File'],
+          ['5', 'All accounts and progress will be restored instantly'],
+        ].map(([n, text]) => (
+          <div key={n} style={{display:'flex',gap:12,marginBottom:8,alignItems:'flex-start'}}>
+            <div style={{width:22,height:22,borderRadius:'50%',background:'var(--gold)',color:'var(--ink)',fontFamily:'var(--font-ui)',fontSize:11,fontWeight:900,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
+              {n}
+            </div>
+            <div style={{fontFamily:'var(--font-ui)',fontSize:12,fontWeight:600,color:'var(--ink2)',lineHeight:1.5}}>{text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── ParentHub ────────────────────────────────────────────────────────────────
 function ParentHub({ allProfiles, onRefresh }) {
-  const [tab, setTab]             = useState('children');   // 'children' | 'manage'
+  const [tab, setTab]             = useState('children');   // 'children' | 'manage' | 'backup'
   const [selected, setSelected]   = useState(null);         // username of selected child
   const [editName, setEditName]   = useState('');
   const [editMsg, setEditMsg]     = useState(null);          // {type:'ok'|'err', text}
@@ -2915,6 +3150,9 @@ function ParentHub({ allProfiles, onRefresh }) {
         </button>
         <button className={`parent-tab${tab==='manage'?' active':''}`} onClick={()=>{setTab('manage');}}>
           ⚙️ Manage Accounts
+        </button>
+        <button className={`parent-tab${tab==='backup'?' active':''}`} onClick={()=>setTab('backup')}>
+          💾 Backup & Restore
         </button>
       </div>
 
@@ -3238,6 +3476,12 @@ function ParentHub({ allProfiles, onRefresh }) {
             })}
           </div>
         )}
+
+        {/* ══════ TAB: BACKUP ══════ */}
+        {tab === 'backup' && (
+          <BackupPanel onImportDone={() => { onRefresh && onRefresh(); }}/>
+        )}
+
       </div>
     </div>
   );
